@@ -8,31 +8,38 @@ import SignUp from '../SignUp/SignUp'
 import SignIn from '../SignIn/SignIn'
 import SignOut from '../SignOut/SignOut'
 import ChangePassword from '../ChangePassword/ChangePassword'
+import Plans from '../Plans/Plans'
 
 class App extends Component {
   constructor () {
     super()
 
     this.state = {
-      user: null,
+      userId: null,
+      userToken: null,
       msgAlerts: []
     }
   }
 
-  setUser = user => this.setState({ user })
+  setUserId = id => this.setState({ userId: id })
 
-  clearUser = () => this.setState({ user: null })
+  setUserToken = token => this.setState({ userToken: token })
+
+  clearUser = () => {
+    this.setState({ userId: null })
+    this.setState({ userToken: null })
+  }
 
   msgAlert = ({ heading, message, variant }) => {
     this.setState({ msgAlerts: [...this.state.msgAlerts, { heading, message, variant }] })
   }
 
   render () {
-    const { msgAlerts, user } = this.state
+    const { msgAlerts, userId, userToken } = this.state
 
     return (
       <Fragment>
-        <Header user={user} />
+        <Header user={userToken} />
         {msgAlerts.map((msgAlert, index) => (
           <AutoDismissAlert
             key={index}
@@ -43,16 +50,19 @@ class App extends Component {
         ))}
         <main className="container">
           <Route path='/sign-up' render={() => (
-            <SignUp msgAlert={this.msgAlert} setUser={this.setUser} />
+            <SignUp msgAlert={this.msgAlert} setUserId={this.setUserId} setUserToken={this.setUserToken} />
           )} />
           <Route path='/sign-in' render={() => (
-            <SignIn msgAlert={this.msgAlert} setUser={this.setUser} />
+            <SignIn msgAlert={this.msgAlert} setUserId={this.setUserId} setUserToken={this.setUserToken} />
           )} />
-          <AuthenticatedRoute user={user} path='/sign-out' render={() => (
-            <SignOut msgAlert={this.msgAlert} clearUser={this.clearUser} user={user} />
+          <AuthenticatedRoute userToken={userToken} path='/sign-out' render={() => (
+            <SignOut msgAlert={this.msgAlert} clearUser={this.clearUser} userToken={userToken} />
           )} />
-          <AuthenticatedRoute user={user} path='/change-password' render={() => (
-            <ChangePassword msgAlert={this.msgAlert} user={user} />
+          <AuthenticatedRoute userToken={userToken} path='/change-password' render={() => (
+            <ChangePassword msgAlert={this.msgAlert} userToken={userToken} />
+          )} />
+          <AuthenticatedRoute userToken={userToken} path='/plans' render={() => (
+            <Plans msgAlert={this.msgAlert} userToken={userToken} userId={userId}/>
           )} />
         </main>
       </Fragment>
