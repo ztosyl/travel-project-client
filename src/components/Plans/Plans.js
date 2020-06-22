@@ -1,13 +1,28 @@
 import React, { useState, useEffect } from 'react'
 import { withRouter } from 'react-router-dom'
-// import Form from 'react-bootstrap/Form'
-// import Button from 'react-bootstrap/Button'
+import Form from 'react-bootstrap/Form'
+import Button from 'react-bootstrap/Button'
 import Card from 'react-bootstrap/Card'
+import Col from 'react-bootstrap/Col'
 import messages from '../AutoDismissAlert/messages'
-import { getPlans } from '../../api/plans'
+import { getPlans, addPlan } from '../../api/plans'
+import { formatDates } from '../../lib/date-functions'
 
 const Plans = ({ userToken, msgAlert }) => {
   const [plans, setPlans] = useState([])
+  const [newPlan, setNewPlan] = useState({
+    destination: '',
+    airLocal: '',
+    airDest: '',
+    depDate: '',
+    returnDate: '',
+    depTimeDest: '',
+    arrTimeDest: '',
+    depTimeHome: '',
+    arrTimeHome: '',
+    hotel: ''
+  })
+  const [rerender, setRerender] = useState(false)
 
   useEffect(() => {
     getPlans(userToken)
@@ -21,48 +36,106 @@ const Plans = ({ userToken, msgAlert }) => {
           variant: 'danger'
         })
       })
-  }, [])
+  }, [rerender])
 
-  // makes dates a bit more readable
-  const formatDates = date => {
-    // we will return this eventually
-    let result = ''
-    // split date by '-', which will give us ['yr', 'mo', 'day']
-    const yearMonthDayArr = date.split('-')
-    // will eventually hold the month name
-    let month
-    // converts the string month number to an integer
-    const monthNum = parseInt(yearMonthDayArr[1], 10)
-    // sees which it is from 1-12, assigns a month name
-    if (monthNum === 1) {
-      month = 'January'
-    } else if (monthNum === 2) {
-      month = 'February'
-    } else if (monthNum === 3) {
-      month = 'March'
-    } else if (monthNum === 4) {
-      month = 'April'
-    } else if (monthNum === 5) {
-      month = 'May'
-    } else if (monthNum === 6) {
-      month = 'June'
-    } else if (monthNum === 7) {
-      month = 'July'
-    } else if (monthNum === 8) {
-      month = 'August'
-    } else if (monthNum === 9) {
-      month = 'September'
-    } else if (monthNum === 10) {
-      month = 'October'
-    } else if (monthNum === 11) {
-      month = 'November'
-    } else {
-      month = 'December'
-    }
-    // puts it in readable format
-    // ex: January 10, 2021
-    result = `${month} ${yearMonthDayArr[2]}, ${yearMonthDayArr[0]}`
-    return result
+  const onDestChange = event => {
+    setNewPlan({
+      ...newPlan,
+      destination: event.target.value
+    })
+  }
+
+  const onDepDateChange = event => {
+    setNewPlan({
+      ...newPlan,
+      depDate: event.target.value
+    })
+  }
+
+  const onReturnDateChange = event => {
+    setNewPlan({
+      ...newPlan,
+      returnDate: event.target.value
+    })
+  }
+
+  const onAirLocalChange = event => {
+    setNewPlan({
+      ...newPlan,
+      airLocal: event.target.value
+    })
+  }
+
+  const onAirDestChange = event => {
+    setNewPlan({
+      ...newPlan,
+      airDest: event.target.value
+    })
+  }
+
+  const onDepTimeDestChange = event => {
+    setNewPlan({
+      ...newPlan,
+      depTimeDest: event.target.value
+    })
+  }
+
+  const onArrTimeDestChange = event => {
+    setNewPlan({
+      ...newPlan,
+      arrTimeDest: event.target.value
+    })
+  }
+
+  const onDepTimeHomeChange = event => {
+    setNewPlan({
+      ...newPlan,
+      depTimeHome: event.target.value
+    })
+  }
+
+  const onArrTimeHomeChange = event => {
+    setNewPlan({
+      ...newPlan,
+      arrTimeHome: event.target.value
+    })
+  }
+
+  const onHotelChange = event => {
+    setNewPlan({
+      ...newPlan,
+      hotel: event.target.value
+    })
+  }
+
+  // turn dates back to the way Django expects them
+
+  const handleSubmit = event => {
+    event.preventDefault()
+    addPlan(newPlan, userToken)
+      .then(() => {
+        setNewPlan({
+          destination: '',
+          airLocal: '',
+          airDest: '',
+          depDate: '',
+          returnDate: '',
+          depTimeDest: '',
+          arrTimeDest: '',
+          depTimeHome: '',
+          arrTimeHome: '',
+          hotel: ''
+        })
+        setRerender(!rerender)
+      }
+      )
+      .catch(() => {
+        msgAlert({
+          heading: 'Plan Post Failed',
+          message: messages.addPlan,
+          variant: 'danger'
+        })
+      })
   }
 
   return (
@@ -79,6 +152,83 @@ const Plans = ({ userToken, msgAlert }) => {
           </Card>
         </div>
       ))}
+      <Card>
+        <Card.Body>
+          <Card.Title>Add New Plan</Card.Title>
+          <Card.Text><Form onSubmit={handleSubmit}>
+            <Form.Group className='col-6' controlId="formBasicDestination">
+              <Form.Label>Destination</Form.Label>
+              <Form.Control type="text" onChange={onDestChange} value={newPlan.destination} placeholder="Enter destination" />
+            </Form.Group>
+            <Form.Row>
+              <Col className='col-3'>
+                <Form.Group controlId="formBasicAirportLocal">
+                  <Form.Label>Airport: Local</Form.Label>
+                  <Form.Control type="text" maxLength="3" onChange={onAirLocalChange} value={newPlan.airLocal} placeholder="Enter code" />
+                  <Form.Text>Please use the three-letter airport code.</Form.Text>
+                </Form.Group>
+              </Col>
+              <Col className='col-3'>
+                <Form.Group controlId="formBasicAirportDest">
+                  <Form.Label>Airport: Destination</Form.Label>
+                  <Form.Control type="text" maxLength="3" onChange={onAirDestChange} value={newPlan.airDest} placeholder="Enter code" />
+                </Form.Group>
+              </Col>
+            </Form.Row>
+            <Form.Row>
+              <Col className='col-3'>
+                <Form.Group controlId="formBasicDepartureDate">
+                  <Form.Label>Start date</Form.Label>
+                  <Form.Control type="text" maxLength="10" value={newPlan.depDate} onChange={onDepDateChange} placeholder="MM/DD/YYYY" />
+                </Form.Group>
+              </Col>
+              <Col className='col-3'>
+                <Form.Group controlId="formBasicArrivalDate">
+                  <Form.Label>End date</Form.Label>
+                  <Form.Label></Form.Label>
+                  <Form.Control type="text" maxLength="10" value={newPlan.returnDate} onChange={onReturnDateChange} placeholder="MM/DD/YYYY" />
+                </Form.Group>
+              </Col>
+            </Form.Row>
+            <Form.Row>
+              <Col className='col-3'>
+                <Form.Group controlId="formBasicDepartureTime">
+                  <Form.Label>Flight Departure time to Destination</Form.Label>
+                  <Form.Control type="text" maxLength="5" value={newPlan.depTimeDest} onChange={onDepTimeDestChange} placeholder="00:00" />
+                  <Form.Text>Please use 24-hour format</Form.Text>
+                </Form.Group>
+              </Col>
+              <Col className='col-3'>
+                <Form.Group controlId="formBasicArrivalTime">
+                  <Form.Label>Flight Arrival time at Destination</Form.Label>
+                  <Form.Control type="text" maxLength="5" value={newPlan.arrTimeDest} onChange={onArrTimeDestChange} placeholder="00:00" />
+                </Form.Group>
+              </Col>
+            </Form.Row>
+            <Form.Row>
+              <Col className='col-3'>
+                <Form.Group controlId="formBasicReturnDepartureTime">
+                  <Form.Label>Flight Departure time to Home</Form.Label>
+                  <Form.Control type="text" maxLength="5" value={newPlan.depTimeHome} onChange={onDepTimeHomeChange} placeholder="00:00" />
+                  <Form.Text>Please use 24-hour format</Form.Text>
+                </Form.Group>
+              </Col>
+              <Col className='col-3'>
+                <Form.Group controlId="formBasicReturnArrivalTime">
+                  <Form.Label>Flight Arrival time at Home</Form.Label>
+                  <Form.Control type="text" maxLength="5" value={newPlan.arrTimeHome} onChange={onArrTimeHomeChange} placeholder="00:00" />
+                </Form.Group>
+              </Col>
+            </Form.Row>
+            <Form.Group controlId="formBasicHotel" className='col-6'>
+              <Form.Control type="text" value={newPlan.hotel} onChange={onHotelChange} placeholder="Enter hotel name" />
+            </Form.Group>
+            <Button variant="primary" type="submit">
+              Add Plan
+            </Button>
+          </Form></Card.Text>
+        </Card.Body>
+      </Card>
     </div>
   )
 }
