@@ -7,5 +7,7 @@ export default {
   changePasswordSuccess: 'Password changed successfully!',
   changePasswordFailure: 'Failed to change passwords. Check your old password and try again.',
   getPlans: 'Failed to get plans. Try again later.',
-  addPlan: 'Failed to add plan. Try again later.'
+  addPlan: 'Failed to add plan. Make sure you filled out all elements of the form in the format provided.',
+  updatePlan: 'Failed to update plan. Make sure you filled out all elements of the form in the format provided.',
+  deletePlan: 'Failed to delete plan. Please try again later.'
 }
