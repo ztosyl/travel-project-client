@@ -19,7 +19,7 @@ class SignOut extends Component {
   }
 
   render () {
-    return ''
+    return ('')
   }
 }
 

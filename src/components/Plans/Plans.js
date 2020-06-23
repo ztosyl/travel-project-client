@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { withRouter } from 'react-router-dom'
+import { withRouter, Link } from 'react-router-dom'
 import Form from 'react-bootstrap/Form'
 import Button from 'react-bootstrap/Button'
 import Card from 'react-bootstrap/Card'
@@ -11,7 +11,7 @@ import { getPlans, addPlan, updatePlan, deletePlan } from '../../api/plans'
 import { formatDates, formatDatesSlash } from '../../lib/date-functions'
 import { formatTimes } from '../../lib/time-functions'
 
-const Plans = ({ userToken, msgAlert }) => {
+const Plans = ({ userToken, msgAlert, setCurrPlan }) => {
   const [plans, setPlans] = useState([])
   const [newPlan, setNewPlan] = useState({
     destination: '',
@@ -27,7 +27,7 @@ const Plans = ({ userToken, msgAlert }) => {
     id: ''
   })
   const [rerender, setRerender] = useState(false)
-  const [show, setShow] = useState(false)
+  const [show, setShow] = useState({})
   const [showDel, setShowDel] = useState(false)
 
   const resetNewPlan = () => {
@@ -46,27 +46,15 @@ const Plans = ({ userToken, msgAlert }) => {
     })
   }
 
-  const handleClose = () => {
-    setShow(false)
-    resetNewPlan()
-  }
-
-  const handleShow = plan => {
-    setNewPlan({
-      ...plan,
-      start_date: formatDatesSlash(plan.start_date),
-      end_date: formatDatesSlash(plan.end_date),
-      flight_to_dep_time: formatTimes(plan.flight_to_dep_time),
-      flight_to_arr_time: formatTimes(plan.flight_to_arr_time),
-      flight_from_dep_time: formatTimes(plan.flight_from_dep_time),
-      flight_from_arr_time: formatTimes(plan.flight_from_arr_time)
-    })
-    setShow(true)
-  }
-
   useEffect(() => {
     getPlans(userToken)
       .then(data => {
+        for (let i = 0; i < data.data.length; i++) {
+          setShow({
+            ...show,
+            [i]: false
+          })
+        }
         setPlans(data.data)
       })
       .catch(() => {
@@ -79,7 +67,6 @@ const Plans = ({ userToken, msgAlert }) => {
   }, [rerender])
 
   const onDestChange = event => {
-    event.target.value = newPlan.destination
     setNewPlan({
       ...newPlan,
       destination: event.target.value
@@ -153,18 +140,7 @@ const Plans = ({ userToken, msgAlert }) => {
     event.preventDefault()
     addPlan(newPlan, userToken)
       .then(() => {
-        setNewPlan({
-          destination: '',
-          airLocal: '',
-          airDest: '',
-          depDate: '',
-          returnDate: '',
-          depTimeDest: '',
-          arrTimeDest: '',
-          depTimeHome: '',
-          arrTimeHome: '',
-          hotel: ''
-        })
+        resetNewPlan()
         setRerender(!rerender)
       }
       )
@@ -181,7 +157,7 @@ const Plans = ({ userToken, msgAlert }) => {
     event.preventDefault()
     updatePlan(newPlan, userToken)
       .then(() => {
-        handleClose()
+        handleClose(newPlan.id)
         setRerender(!rerender)
       }
       )
@@ -221,10 +197,34 @@ const Plans = ({ userToken, msgAlert }) => {
       })
   }
 
+  const handleClose = id => {
+    setShow({
+      ...show,
+      [id]: false
+    })
+    resetNewPlan()
+  }
+
+  const handleShow = plan => {
+    setNewPlan({
+      ...plan,
+      start_date: formatDatesSlash(plan.start_date),
+      end_date: formatDatesSlash(plan.end_date),
+      flight_to_dep_time: formatTimes(plan.flight_to_dep_time),
+      flight_to_arr_time: formatTimes(plan.flight_to_arr_time),
+      flight_from_dep_time: formatTimes(plan.flight_from_dep_time),
+      flight_from_arr_time: formatTimes(plan.flight_from_arr_time)
+    })
+    setShow({
+      ...show,
+      [plan.id]: true
+    })
+  }
+
   return (
     <div>
       <h2>Your plans:</h2>
-      {plans && plans.map(plan => (
+      {plans && plans.map((plan, index) => (
         <div key={plan.id}>
           <Accordion defaultActiveKey="0">
             <Card>
@@ -244,12 +244,12 @@ const Plans = ({ userToken, msgAlert }) => {
                   <Card.Text>Heading home at {formatTimes(plan.flight_from_dep_time)} from {plan.arr_airport_code}, and arriving in {plan.dep_airport_code} at {formatTimes(plan.flight_from_arr_time)}.</Card.Text>
                   <Button onClick={() => handleShow(plan)}>Update plan</Button>
                   <Button onClick={() => handleDelete(plan)}>Delete plan</Button>
-                  <Button>View Itinerary</Button>
+                  <Link to={`/${plan.id}/itineraries`}><Button>View Itinerary</Button></Link>
                 </Card.Body>
               </Card>
             </Accordion.Collapse>
           </Accordion>
-          <Modal show={show} onHide={handleClose} backdrop="static">
+          <Modal show={show[plan.id]} onHide={() => handleClose(plan.id)} backdrop="static">
             <Modal.Header closeButton>
               <Modal.Title>Update Plan</Modal.Title>
             </Modal.Header>

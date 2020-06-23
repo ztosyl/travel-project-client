@@ -9,5 +9,9 @@ export default {
   getPlans: 'Failed to get plans. Try again later.',
   addPlan: 'Failed to add plan. Make sure you filled out all elements of the form in the format provided.',
   updatePlan: 'Failed to update plan. Make sure you filled out all elements of the form in the format provided.',
-  deletePlan: 'Failed to delete plan. Please try again later.'
+  deletePlan: 'Failed to delete plan. Please try again later.',
+  getItineraries: 'Failed to get itinerary. Try again later.',
+  deleteItinerary: 'Failed to delete itinerary items. Try again later.',
+  updateItinerary: 'Failed to update itinerary item. Make sure you filled out all elements of the form in the format provided.',
+  postItinerary: 'Failed to post itinerary item. Make sure you filled out all elements of the form in the format provided.'
 }

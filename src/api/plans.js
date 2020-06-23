@@ -12,6 +12,16 @@ export const getPlans = token => {
   })
 }
 
+export const getPlan = (id, token) => {
+  return axios({
+    url: apiUrl + '/plans/' + id + '/',
+    method: 'GET',
+    headers: {
+      'Authorization': `Token ${token}`
+    }
+  })
+}
+
 export const addPlan = (plan, token) => {
   const startDate = reformatDates(plan.start_date)
   const endDate = reformatDates(plan.end_date)

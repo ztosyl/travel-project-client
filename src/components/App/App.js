@@ -9,6 +9,7 @@ import SignIn from '../SignIn/SignIn'
 import SignOut from '../SignOut/SignOut'
 import ChangePassword from '../ChangePassword/ChangePassword'
 import Plans from '../Plans/Plans'
+import Itineraries from '../Itineraries/Itineraries'
 
 class App extends Component {
   constructor () {
@@ -63,6 +64,9 @@ class App extends Component {
           )} />
           <AuthenticatedRoute userToken={userToken} path='/plans' render={() => (
             <Plans msgAlert={this.msgAlert} userToken={userToken} userId={userId}/>
+          )} />
+          <AuthenticatedRoute userToken={userToken} path='/:planId/itineraries' render={() => (
+            <Itineraries msgAlert={this.msgAlert} userToken={userToken} userId={userId}/>
           )} />
         </main>
       </Fragment>
