@@ -24,7 +24,7 @@ const alwaysOptions = (
 )
 
 const Header = ({ user }) => (
-  <Navbar bg="primary" variant="dark" expand="md">
+  <Navbar className='main-nav' expand="md">
     <Navbar.Brand href="#">
       travel-project-client
     </Navbar.Brand>

@@ -1,1 +1,42 @@
 @import '~bootstrap/scss/bootstrap';
+@import 'variables';
+
+body {
+  background-attachment: fixed;
+  background-image: url('public/worldmap_bg.jpg');
+  background-position: 50% 35%;
+  background-repeat: no-repeat;
+  font-family: $body-font;
+}
+
+h2 {
+  font-family: $title-font;
+  font-weight: bold;
+}
+
+h3 {
+  font-family: $title-font;
+}
+
+button {
+  font-family: $title-font;
+}
+
+.main-nav {
+  background-color: $nav-color;
+  font-family: $title-font;
+}
+
+.card {
+  background-color: $bg-color;
+  margin: 20px;
+  padding: 10px;
+}
+
+.list-group-item {
+  background-color: $bg-color;
+}
+
+.card-header {
+  background-color: $nav-color;
+}
