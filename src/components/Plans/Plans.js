@@ -260,7 +260,7 @@ const Plans = ({ userToken, msgAlert, setCurrPlan }) => {
               <Card.Header><h3>{plan.destination}</h3></Card.Header>
               <ListGroup variant="flush">
                 <ListGroup.Item>
-                  <Card.Text><h4><span className='title-class'>Trip Duration: </span>{formatDates(plan.start_date)}-{formatDates(plan.end_date)}</h4></Card.Text>
+                  <Card.Text><h4><span className='title-class'>Trip Duration: </span>{formatDates(plan.start_date)} - {formatDates(plan.end_date)}</h4></Card.Text>
                 </ListGroup.Item>
               </ListGroup>
               <Accordion.Toggle onClick={() => handleToggle(plan.id)} as={Button} variant="link" eventKey="2">
@@ -468,7 +468,7 @@ const Plans = ({ userToken, msgAlert, setCurrPlan }) => {
         keyboard={false}
       >
         <Modal.Header closeButton>
-          <Modal.Title>Confirm deletion</Modal.Title>
+          <Modal.Title className='title-class'>Confirm deletion</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           Are you sure you want to delete?

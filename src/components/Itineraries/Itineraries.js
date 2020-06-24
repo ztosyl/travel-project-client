@@ -245,7 +245,7 @@ const Itineraries = ({ msgAlert, userToken, match }) => {
                 <Accordion.Collapse eventKey='1'>
                   <Card.Body>
                     <ul>
-                      <li><Card.Text><h5><span className='title-class'>Time: </span>{formatTimes(itinerary.start_time)}-{formatTimes(itinerary.end_time)}</h5></Card.Text></li>
+                      <li><Card.Text><h5><span className='title-class'>Time: </span>{formatTimes(itinerary.start_time)} - {formatTimes(itinerary.end_time)}</h5></Card.Text></li>
                       <li><Card.Text><h5><span className='title-class'>Description: </span>{itinerary.description}.</h5></Card.Text></li>
                       <li><Card.Text><h5><span className='title-class'>Address: </span>{itinerary.address}</h5></Card.Text></li>
                     </ul>
