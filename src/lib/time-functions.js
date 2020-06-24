@@ -9,3 +9,10 @@ export const formatTimes = time => {
     return ''
   }
 }
+
+// takes '2020-08-01T10:00:00', returns '10:00'
+export const findNormalTime = time => {
+  const timeArr = time.split('T')
+  const longTime = timeArr[1]
+  return formatTimes(longTime)
+}

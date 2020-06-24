@@ -111,6 +111,15 @@ button {
   text-align: center;
 }
 
+.flight-card {
+  background-color: $nav-color;
+}
+
+.flight-listgroup {
+  padding-bottom: 20px;
+  text-align: left;
+}
+
 .auth-form {
   margin-top: 30px;
 }
@@ -120,11 +129,17 @@ form {
 }
 
 .form-label {
+  font-size: 15px;
   font-weight: bold;
 }
 
 .form-text {
   font-weight: bold;
+}
+
+.faux-link {
+  cursor: pointer;
+  text-decoration: underline;
 }
 
 .modal-content {

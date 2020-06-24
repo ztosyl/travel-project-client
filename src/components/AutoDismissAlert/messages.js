@@ -13,5 +13,6 @@ export default {
   getItineraries: 'Failed to get itinerary. Try again later.',
   deleteItinerary: 'Failed to delete itinerary items. Try again later.',
   updateItinerary: 'Failed to update itinerary item. Make sure you filled out all elements of the form in the format provided.',
-  postItinerary: 'Failed to post itinerary item. Make sure you filled out all elements of the form in the format provided.'
+  postItinerary: 'Failed to post itinerary item. Make sure you filled out all elements of the form in the format provided.',
+  searchFlight: 'Failed to find flights. Please try again later.'
 }

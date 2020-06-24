@@ -11,8 +11,9 @@ import Row from 'react-bootstrap/Row'
 import Col from 'react-bootstrap/Col'
 import messages from '../AutoDismissAlert/messages'
 import { getPlans, addPlan, updatePlan, deletePlan } from '../../api/plans'
-import { formatDates, formatDatesSlash } from '../../lib/date-functions'
-import { formatTimes } from '../../lib/time-functions'
+import { getFlights, getToken } from '../../api/amadeus'
+import { formatDates, formatDatesSlash, reformatDates, findNormalDate } from '../../lib/date-functions'
+import { formatTimes, findNormalTime } from '../../lib/time-functions'
 import { addDateTimePlan, sortByDate } from '../../lib/sort'
 
 const Plans = ({ userToken, msgAlert, setCurrPlan }) => {
@@ -34,6 +35,9 @@ const Plans = ({ userToken, msgAlert, setCurrPlan }) => {
   const [show, setShow] = useState({})
   const [showDel, setShowDel] = useState(false)
   const [accordionWord, setAccordionWord] = useState({})
+  const [showFlightSearch, setShowFlightSearch] = useState(false)
+  const [flightInfo, setFlightInfo] = useState('Sorry, we could not find any flights at this time. Please try again later.')
+  const [addFlightInfo, setAddFlightInfo] = useState({})
 
   const resetNewPlan = () => {
     setNewPlan({
@@ -250,6 +254,74 @@ const Plans = ({ userToken, msgAlert, setCurrPlan }) => {
     }
   }
 
+  const handleFlightSearch = () => {
+    getToken()
+      .then(data => {
+        const token = data.data.access_token
+        // beginning of URL
+        let urlString = 'https://test.api.amadeus.com/v2/shopping/flight-offers?'
+        // add airport codes
+        urlString = urlString + `originLocationCode=${newPlan.dep_airport_code}&destinationLocationCode=${newPlan.arr_airport_code}`
+        // format departure and return dates to a format recognizable by the API, ex 2020-06-24
+        const depDate = reformatDates(newPlan.start_date)
+        const retDate = reformatDates(newPlan.end_date)
+        // add them to the URL we'll eventually send to Amadeus
+        urlString = urlString + `&departureDate=${depDate}&returnDate=${retDate}`
+        // add some extra default variables to refine our search a bit
+        // will only return nonstop flights for one adult with prices in USD
+        // will only return a maximum of 10 flights
+        urlString = urlString + '&adults=1&nonStop=true&currencyCode=USD&max=10'
+        // send result to API and get flights!
+        return getFlights(urlString, token)
+      })
+      .then(data => {
+        if (!data.data.data || data.data.data.length === 0) {
+          setFlightInfo('Sorry, no flights matched your search. Please try again.')
+        } else {
+          let addFlightObj = {}
+          const flights = data.data.data
+          for (let i = 0; i < flights.length; i++) {
+            addFlightObj = {
+              ...addFlightObj,
+              [i]: {
+                flight_to_dep_time: findNormalTime(flights[i].itineraries[0].segments[0].departure.at),
+                flight_to_arr_time: findNormalTime(flights[i].itineraries[0].segments[0].arrival.at),
+                flight_from_dep_time: findNormalTime(flights[i].itineraries[1].segments[0].departure.at),
+                flight_from_arr_time: findNormalTime(flights[i].itineraries[1].segments[0].arrival.at)
+              }
+            }
+          }
+          setFlightInfo(flights)
+          setAddFlightInfo(addFlightObj)
+        }
+        setShowFlightSearch(true)
+      })
+      .catch(error => {
+        console.log(error)
+        setFlightInfo('Sorry, we could not find any flights at this time. Please try again later.')
+        msgAlert({
+          heading: 'Flight Search Failed',
+          message: messages.searchFlight,
+          variant: 'danger'
+        })
+      })
+  }
+
+  const handleFlightSearchClose = () => {
+    setShowFlightSearch(false)
+    setFlightInfo('Sorry, we could not find any flights at this time. Please try again later.')
+  }
+
+  const handleFlightSelection = index => {
+    event.preventDefault()
+    const flightObj = addFlightInfo[index]
+    setNewPlan({
+      ...newPlan,
+      ...flightObj
+    })
+    handleFlightSearchClose()
+  }
+
   return (
     <div>
       <h2 className='page-title'>Travel Plans</h2>
@@ -415,6 +487,7 @@ const Plans = ({ userToken, msgAlert, setCurrPlan }) => {
                       <Form.Label>Return Date</Form.Label>
                       <Form.Label></Form.Label>
                       <Form.Control type="text" maxLength="10" value={newPlan.end_date} onChange={onReturnDateChange} placeholder="MM/DD/YYYY" />
+                      <Form.Text className='faux-link' onClick={handleFlightSearch}>Search available flights with this info.</Form.Text>
                     </Form.Group>
                   </Col>
                 </Form.Row>
@@ -478,6 +551,44 @@ const Plans = ({ userToken, msgAlert, setCurrPlan }) => {
             Close
           </Button>
           <Button variant="danger" onClick={handleConfirmDelete}>Delete</Button>
+        </Modal.Footer>
+      </Modal>
+      <Modal
+        show={showFlightSearch}
+        onHide={handleFlightSearchClose}
+        backdrop="static"
+        keyboard={false}
+      >
+        <Modal.Header closeButton>
+          <Modal.Title className='title-class'>Available flights</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          {Array.isArray(flightInfo) && flightInfo.map((flight, index) => (
+            <div key='flight.id'>
+              <Card className='flight-card'>
+                <Card.Body>
+                  <Card.Title className='title-class flight-title'><h3>Departure</h3></Card.Title>
+                  <ListGroup className="list-group-flush flight-listgroup">
+                    <ListGroup.Item>Depart from {flight.itineraries[0].segments[0].departure.iataCode} at {findNormalTime(flight.itineraries[0].segments[0].departure.at)} on {findNormalDate(flight.itineraries[0].segments[0].departure.at)}</ListGroup.Item>
+                    <ListGroup.Item>Arrive at {flight.itineraries[0].segments[0].arrival.iataCode} at {findNormalTime(flight.itineraries[0].segments[0].arrival.at)} on {findNormalDate(flight.itineraries[0].segments[0].arrival.at)}</ListGroup.Item>
+                  </ListGroup>
+                  <Card.Title className='title-class flight-title'><h3>Return</h3></Card.Title>
+                  <ListGroup className="list-group-flush flight-listgroup">
+                    <ListGroup.Item>Depart from {flight.itineraries[1].segments[0].departure.iataCode} at {findNormalTime(flight.itineraries[1].segments[0].departure.at)} on {findNormalDate(flight.itineraries[1].segments[0].departure.at)}</ListGroup.Item>
+                    <ListGroup.Item>Arrive at {flight.itineraries[1].segments[0].arrival.iataCode} at {findNormalTime(flight.itineraries[1].segments[0].arrival.at)} on {findNormalDate(flight.itineraries[1].segments[0].arrival.at)}</ListGroup.Item>
+                  </ListGroup>
+                  <Card.Title className='flight-title'>Total price: ${flight.price.total}</Card.Title>
+                  <Button onClick={() => handleFlightSelection(index)} className='btn btn-primary'>Use This Flight</Button>
+                </Card.Body>
+              </Card>
+            </div>
+          ))}
+          {!Array.isArray(flightInfo) && flightInfo}
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={handleFlightSearchClose}>
+            Close
+          </Button>
         </Modal.Footer>
       </Modal>
     </div>

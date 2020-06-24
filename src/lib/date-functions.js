@@ -32,6 +32,12 @@ export const reformatDates = date => {
   let result = ''
   const depDateArray = date.split('/')
   result = `${depDateArray[2]}-${depDateArray[0]}-${depDateArray[1]}`
-  console.log(result)
   return result
+}
+
+// takes '2020-08-01T10:00:00', returns '10:00'
+export const findNormalDate = date => {
+  const dateArr = date.split('T')
+  const unformattedDate = dateArr[0]
+  return formatDatesSlash(unformattedDate)
 }
