@@ -18,8 +18,75 @@ h3 {
   font-family: $title-font;
 }
 
+ul {
+  list-style-type: none;
+  text-align: left;
+}
+
 button {
   font-family: $title-font;
+}
+
+.page-title {
+  font-size: 40px;
+  font-style: italic;
+  letter-spacing: 3px;
+  margin-top: 10px;
+  text-align: center;
+}
+
+.welcome {
+  font-style: italic;
+  font-weight: bold;
+  letter-spacing: 1.5px;
+}
+
+.button-center {
+  text-align: center;
+}
+
+.title-class {
+  font-family: $title-font;
+}
+
+.btn-primary {
+  background-color: $button-color;
+  border-color: $button-color;
+
+  &:not(:disabled):not(.disabled):active {
+    background-color: $button-color-hover;
+    border-color: $button-color-hover;
+  }
+
+    &:hover {
+      background-color: $button-color-hover;
+      border-color: $button-color-hover;
+    }
+
+}
+
+.btn-link {
+  color: $link-color;
+  text-decoration: none;
+
+  &:focus {
+    text-decoration: none;
+  }
+
+  &:hover {
+    color: $link-color-hover;
+    text-decoration: none;
+  }
+
+}
+
+.add-button {
+  color: $dark-link-color;
+  font-size: 25px;
+
+  &:hover {
+    color: $dark-link-color-hover;
+  }
 }
 
 .main-nav {
@@ -27,10 +94,45 @@ button {
   font-family: $title-font;
 }
 
+.navbar-brand {
+  font-size: 27px;
+  font-style: italic;
+  font-weight: bold;
+  letter-spacing: 2px;
+}
+
 .card {
   background-color: $bg-color;
   margin: 20px;
   padding: 10px;
+}
+
+.card-body {
+  text-align: center;
+}
+
+.auth-form {
+  margin-top: 30px;
+}
+
+form {
+  text-align: left;
+}
+
+.form-label {
+  font-weight: bold;
+}
+
+.form-text {
+  font-weight: bold;
+}
+
+.modal-content {
+  background-color: $modal-color;
+}
+
+.auth-card {
+  background-color: $nav-color;
 }
 
 .list-group-item {

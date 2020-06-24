@@ -6,6 +6,7 @@ import messages from '../AutoDismissAlert/messages'
 
 import Form from 'react-bootstrap/Form'
 import Button from 'react-bootstrap/Button'
+import Card from 'react-bootstrap/Card'
 
 class ChangePassword extends Component {
   constructor () {
@@ -49,35 +50,40 @@ class ChangePassword extends Component {
     return (
       <div className="row">
         <div className="col-sm-10 col-md-8 mx-auto mt-5">
-          <h2>Change Password</h2>
-          <Form onSubmit={this.onChangePassword}>
-            <Form.Group controlId="oldPassword">
-              <Form.Control
-                required
-                name="oldPassword"
-                value={oldPassword}
-                type="password"
-                placeholder="Old Password"
-                onChange={this.handleChange}
-              />
-            </Form.Group>
-            <Form.Group controlId="newPassword">
-              <Form.Control
-                required
-                name="newPassword"
-                value={newPassword}
-                type="password"
-                placeholder="New Password"
-                onChange={this.handleChange}
-              />
-            </Form.Group>
-            <Button
-              variant="primary"
-              type="submit"
-            >
-              Submit
-            </Button>
-          </Form>
+          <Card className='auth-card'>
+            <h3>Change Password</h3>
+            <Form className='auth-form' onSubmit={this.onChangePassword}>
+              <Form.Group controlId="oldPassword">
+                <Form.Control
+                  required
+                  name="oldPassword"
+                  value={oldPassword}
+                  type="password"
+                  placeholder="Old Password"
+                  onChange={this.handleChange}
+                />
+              </Form.Group>
+              <Form.Group controlId="newPassword">
+                <Form.Control
+                  required
+                  name="newPassword"
+                  value={newPassword}
+                  type="password"
+                  placeholder="New Password"
+                  onChange={this.handleChange}
+                />
+              </Form.Group>
+              <div clasName='center-button'>
+                <Button
+                  variant="primary"
+                  type="submit"
+                  className='col-3'
+                >
+                  Submit
+                </Button>
+              </div>
+            </Form>
+          </Card>
         </div>
       </div>
     )

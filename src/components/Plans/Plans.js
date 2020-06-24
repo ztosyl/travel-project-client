@@ -3,10 +3,12 @@ import { withRouter, Link } from 'react-router-dom'
 import Form from 'react-bootstrap/Form'
 import Button from 'react-bootstrap/Button'
 import Card from 'react-bootstrap/Card'
-import Col from 'react-bootstrap/Col'
 import Accordion from 'react-bootstrap/Accordion'
 import Modal from 'react-bootstrap/Modal'
 import ListGroup from 'react-bootstrap/ListGroup'
+import Container from 'react-bootstrap/Container'
+import Row from 'react-bootstrap/Row'
+import Col from 'react-bootstrap/Col'
 import messages from '../AutoDismissAlert/messages'
 import { getPlans, addPlan, updatePlan, deletePlan } from '../../api/plans'
 import { formatDates, formatDatesSlash } from '../../lib/date-functions'
@@ -250,7 +252,7 @@ const Plans = ({ userToken, msgAlert, setCurrPlan }) => {
 
   return (
     <div>
-      <h2>Your plans:</h2>
+      <h2 className='page-title'>Travel Plans</h2>
       {plans && plans.map((plan, index) => (
         <div key={plan.id}>
           <Accordion>
@@ -258,7 +260,7 @@ const Plans = ({ userToken, msgAlert, setCurrPlan }) => {
               <Card.Header><h3>{plan.destination}</h3></Card.Header>
               <ListGroup variant="flush">
                 <ListGroup.Item>
-                  <Card.Text><h5>From {formatDates(plan.start_date)} to {formatDates(plan.end_date)}</h5></Card.Text>
+                  <Card.Text><h4><span className='title-class'>Trip Duration: </span>{formatDates(plan.start_date)}-{formatDates(plan.end_date)}</h4></Card.Text>
                 </ListGroup.Item>
               </ListGroup>
               <Accordion.Toggle onClick={() => handleToggle(plan.id)} as={Button} variant="link" eventKey="2">
@@ -266,77 +268,107 @@ const Plans = ({ userToken, msgAlert, setCurrPlan }) => {
               </Accordion.Toggle>
               <Accordion.Collapse eventKey='2'>
                 <Card.Body>
-                  <Card.Text>Taking off at {formatTimes(plan.flight_to_dep_time)} from {plan.dep_airport_code}, and arriving in {plan.arr_airport_code} at {formatTimes(plan.flight_to_arr_time)}.</Card.Text>
-                  <Card.Text>Staying at {plan.hotel_name}.</Card.Text>
-                  <Card.Text>Heading home at {formatTimes(plan.flight_from_dep_time)} from {plan.arr_airport_code}, and arriving in {plan.dep_airport_code} at {formatTimes(plan.flight_from_arr_time)}.</Card.Text>
-                  <Button onClick={() => handleShow(plan)}>Update plan</Button>
-                  <Button onClick={() => handleDelete(plan)}>Delete plan</Button>
-                  <Link to={`/${plan.id}/itineraries`}><Button>View Itinerary</Button></Link>
+                  <ul>
+                    <li><Card.Text><h5><span className='title-class'>Flight to {plan.destination}:</span> Departs at {formatTimes(plan.flight_to_dep_time)} from {plan.dep_airport_code}, and arrives in {plan.arr_airport_code} at {formatTimes(plan.flight_to_arr_time)}.</h5></Card.Text></li>
+                    <li><Card.Text><h5><span className='title-class'>Hotel name:</span> {plan.hotel_name}.</h5></Card.Text></li>
+                    <li><Card.Text><h5><span className='title-class'>Flight from {plan.destination}:</span> Departs at {formatTimes(plan.flight_from_dep_time)} from {plan.arr_airport_code}, and arrives in {plan.dep_airport_code} at {formatTimes(plan.flight_from_arr_time)}.</h5></Card.Text></li>
+                  </ul>
+                  <Container>
+                    <Row>
+                      <Col className='col-4'>
+                        <Button onClick={() => handleShow(plan)}>Update plan</Button>
+                      </Col>
+                      <Col className='col-4'>
+                        <Button onClick={() => handleDelete(plan)}>Delete plan</Button>
+                      </Col>
+                      <Col className='col-4'>
+                        <Link to={`/${plan.id}/itineraries`}><Button>View Itinerary</Button></Link>
+                      </Col>
+                    </Row>
+                  </Container>
                 </Card.Body>
               </Accordion.Collapse>
             </Card>
           </Accordion>
           <Modal show={show[plan.id]} onHide={() => handleClose(plan.id)} backdrop="static">
             <Modal.Header closeButton>
-              <Modal.Title>Update Plan</Modal.Title>
+              <Modal.Title className='title-class'>Update Plan</Modal.Title>
             </Modal.Header>
             <Modal.Body>
               <Form onSubmit={handleUpdateSubmit}>
-                <Form.Group className='col-6' controlId="formBasicDestination">
+                <Form.Group controlId="formBasicDestination">
                   <Form.Label>Destination</Form.Label>
                   <Form.Control type="text" onChange={onDestChange} value={newPlan.destination}/>
                 </Form.Group>
                 <Form.Row>
-                  <Form.Group controlId="formBasicAirportLocal">
-                    <Form.Label>Airport: Local</Form.Label>
-                    <Form.Control type="text" maxLength="3" onChange={onAirLocalChange} value={newPlan.dep_airport_code} />
-                    <Form.Text>Please use the three-letter airport code.</Form.Text>
-                  </Form.Group>
-                  <Form.Group controlId="formBasicAirportDest">
-                    <Form.Label>Airport: Destination</Form.Label>
-                    <Form.Control type="text" maxLength="3" onChange={onAirDestChange} value={newPlan.arr_airport_code} />
-                  </Form.Group>
+                  <Col className='col-6'>
+                    <Form.Group controlId="formBasicAirportLocal">
+                      <Form.Label>Local Airport</Form.Label>
+                      <Form.Control type="text" maxLength="3" onChange={onAirLocalChange} value={newPlan.dep_airport_code} />
+                      <Form.Text>Please use the three-letter airport code.</Form.Text>
+                    </Form.Group>
+                  </Col>
+                  <Col className='col-6'>
+                    <Form.Group controlId="formBasicAirportDest">
+                      <Form.Label>Destination Airport</Form.Label>
+                      <Form.Control type="text" maxLength="3" onChange={onAirDestChange} value={newPlan.arr_airport_code} />
+                    </Form.Group>
+                  </Col>
                 </Form.Row>
                 <Form.Row>
-                  <Form.Group controlId="formBasicDepartureDate">
-                    <Form.Label>Start date</Form.Label>
-                    <Form.Control type="text" maxLength="10" value={newPlan.start_date} onChange={onDepDateChange}/>
-                  </Form.Group>
-                  <Form.Group controlId="formBasicArrivalDate">
-                    <Form.Label>End date</Form.Label>
-                    <Form.Label></Form.Label>
-                    <Form.Control type="text" maxLength="10" value={newPlan.end_date} onChange={onReturnDateChange}/>
-                  </Form.Group>
+                  <Col className='col-6'>
+                    <Form.Group controlId="formBasicDepartureDate">
+                      <Form.Label>Departure date</Form.Label>
+                      <Form.Control type="text" maxLength="10" value={newPlan.start_date} onChange={onDepDateChange}/>
+                    </Form.Group>
+                  </Col>
+                  <Col className='col-6'>
+                    <Form.Group controlId="formBasicArrivalDate">
+                      <Form.Label>Return date</Form.Label>
+                      <Form.Label></Form.Label>
+                      <Form.Control type="text" maxLength="10" value={newPlan.end_date} onChange={onReturnDateChange}/>
+                    </Form.Group>
+                  </Col>
                 </Form.Row>
                 <Form.Row>
-                  <Form.Group controlId="formBasicDepartureTime">
-                    <Form.Label>Flight Departure time to Destination</Form.Label>
-                    <Form.Control type="text" maxLength="5" value={newPlan.flight_to_dep_time} onChange={onDepTimeDestChange}/>
-                    <Form.Text>Please use 24-hour format</Form.Text>
-                  </Form.Group>
-                  <Form.Group controlId="formBasicArrivalTime">
-                    <Form.Label>Flight Arrival time at Destination</Form.Label>
-                    <Form.Control type="text" maxLength="5" value={newPlan.flight_to_arr_time} onChange={onArrTimeDestChange} />
-                  </Form.Group>
+                  <Col className='col-6'>
+                    <Form.Group controlId="formBasicDepartureTime">
+                      <Form.Label>Flight Departure, Destination</Form.Label>
+                      <Form.Control type="text" maxLength="5" value={newPlan.flight_to_dep_time} onChange={onDepTimeDestChange}/>
+                      <Form.Text>Please use 24-hour format</Form.Text>
+                    </Form.Group>
+                  </Col>
+                  <Col className='col-6'>
+                    <Form.Group controlId="formBasicArrivalTime">
+                      <Form.Label>Flight Arrival, Destination</Form.Label>
+                      <Form.Control type="text" maxLength="5" value={newPlan.flight_to_arr_time} onChange={onArrTimeDestChange} />
+                    </Form.Group>
+                  </Col>
                 </Form.Row>
                 <Form.Row>
-                  <Form.Group controlId="formBasicReturnDepartureTime">
-                    <Form.Label>Flight Departure time to Home</Form.Label>
-                    <Form.Control type="text" maxLength="5" value={newPlan.flight_from_dep_time} onChange={onDepTimeHomeChange} />
-                    <Form.Text>Please use 24-hour format</Form.Text>
-                  </Form.Group>
-                  <Form.Group controlId="formBasicReturnArrivalTime">
-                    <Form.Label>Flight Arrival time at Home</Form.Label>
-                    <Form.Control type="text" maxLength="5" value={newPlan.flight_from_arr_time} onChange={onArrTimeHomeChange} />
-                  </Form.Group>
+                  <Col className='col-6'>
+                    <Form.Group controlId="formBasicReturnDepartureTime">
+                      <Form.Label>Flight Departure, Home</Form.Label>
+                      <Form.Control type="text" maxLength="5" value={newPlan.flight_from_dep_time} onChange={onDepTimeHomeChange} />
+                      <Form.Text>Please use 24hr format</Form.Text>
+                    </Form.Group>
+                  </Col>
+                  <Col className='col-6'>
+                    <Form.Group controlId="formBasicReturnArrivalTime">
+                      <Form.Label>Flight Arrival, Home</Form.Label>
+                      <Form.Control type="text" maxLength="5" value={newPlan.flight_from_arr_time} onChange={onArrTimeHomeChange} />
+                    </Form.Group>
+                  </Col>
                 </Form.Row>
-                <Form.Group controlId="formBasicHotel" className='col-6'>
+                <Form.Group controlId="formBasicHotel">
                   <Form.Label>Hotel Name</Form.Label>
                   <Form.Control type="text" value={newPlan.hotel_name} onChange={onHotelChange} placeholder="Enter hotel name" />
                 </Form.Group>
-                <Button variant="primary" type="submit">
-                  Update
-                </Button>
+                <Modal.Footer>
+                  <Button variant="primary" type="submit">
+                    Update Plan
+                  </Button>
+                </Modal.Footer>
               </Form>
             </Modal.Body>
           </Modal>
@@ -345,7 +377,7 @@ const Plans = ({ userToken, msgAlert, setCurrPlan }) => {
       <Accordion>
         <Card>
           <Card.Header>
-            <Accordion.Toggle as={Button} variant="link" eventKey="1">
+            <Accordion.Toggle as={Button} variant="link" eventKey="1" className='add-button'>
           Add New Plan
             </Accordion.Toggle>
           </Card.Header>
@@ -361,26 +393,26 @@ const Plans = ({ userToken, msgAlert, setCurrPlan }) => {
                 <Form.Row>
                   <Col className='col-3'>
                     <Form.Group controlId="formBasicAirportLocal">
-                      <Form.Label>Airport: Local</Form.Label>
+                      <Form.Label>Local Airport</Form.Label>
                       <Form.Control type="text" maxLength="3" onChange={onAirLocalChange} value={newPlan.dep_airport_code} placeholder="Enter code" />
                       <Form.Text>Please use the three-letter airport code.</Form.Text>
                     </Form.Group>
                   </Col>
                   <Col className='col-3'>
                     <Form.Group controlId="formBasicAirportDest">
-                      <Form.Label>Airport: Destination</Form.Label>
+                      <Form.Label>Destination Aiport</Form.Label>
                       <Form.Control type="text" maxLength="3" onChange={onAirDestChange} value={newPlan.arr_airport_code} placeholder="Enter code" />
                     </Form.Group>
                   </Col>
                   <Col className='col-3'>
                     <Form.Group controlId="formBasicDepartureDate">
-                      <Form.Label>Start date</Form.Label>
+                      <Form.Label>Departure Date</Form.Label>
                       <Form.Control type="text" maxLength="10" value={newPlan.start_date} onChange={onDepDateChange} placeholder="MM/DD/YYYY" />
                     </Form.Group>
                   </Col>
                   <Col className='col-3'>
                     <Form.Group controlId="formBasicArrivalDate">
-                      <Form.Label>End date</Form.Label>
+                      <Form.Label>Return Date</Form.Label>
                       <Form.Label></Form.Label>
                       <Form.Control type="text" maxLength="10" value={newPlan.end_date} onChange={onReturnDateChange} placeholder="MM/DD/YYYY" />
                     </Form.Group>
@@ -389,26 +421,26 @@ const Plans = ({ userToken, msgAlert, setCurrPlan }) => {
                 <Form.Row>
                   <Col className='col-3'>
                     <Form.Group controlId="formBasicDepartureTime">
-                      <Form.Label>Flight Departure time to Destination</Form.Label>
+                      <Form.Label>Flight Departure, Destination</Form.Label>
                       <Form.Control type="text" maxLength="5" value={newPlan.flight_to_dep_time} onChange={onDepTimeDestChange} placeholder="00:00" />
-                      <Form.Text>Please use 24-hour format</Form.Text>
+                      <Form.Text>Please use 24hr format</Form.Text>
                     </Form.Group>
                   </Col>
                   <Col className='col-3'>
                     <Form.Group controlId="formBasicArrivalTime">
-                      <Form.Label>Flight Arrival time at Destination</Form.Label>
+                      <Form.Label>Flight Arrival, Destination</Form.Label>
                       <Form.Control type="text" maxLength="5" value={newPlan.flight_to_arr_time} onChange={onArrTimeDestChange} placeholder="00:00" />
                     </Form.Group>
                   </Col>
                   <Col className='col-3'>
                     <Form.Group controlId="formBasicReturnDepartureTime">
-                      <Form.Label>Flight Departure time to Home</Form.Label>
+                      <Form.Label>Flight Departure, Home</Form.Label>
                       <Form.Control type="text" maxLength="5" value={newPlan.flight_from_dep_time} onChange={onDepTimeHomeChange} placeholder="00:00" />
                     </Form.Group>
                   </Col>
                   <Col className='col-3'>
                     <Form.Group controlId="formBasicReturnArrivalTime">
-                      <Form.Label>Flight Arrival time at Home</Form.Label>
+                      <Form.Label>Flight Arrival, Home</Form.Label>
                       <Form.Control type="text" maxLength="5" value={newPlan.flight_from_arr_time} onChange={onArrTimeHomeChange} placeholder="00:00" />
                     </Form.Group>
                   </Col>

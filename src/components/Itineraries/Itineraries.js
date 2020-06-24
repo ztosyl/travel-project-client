@@ -3,10 +3,12 @@ import { withRouter, Redirect } from 'react-router-dom'
 import Form from 'react-bootstrap/Form'
 import Button from 'react-bootstrap/Button'
 import Card from 'react-bootstrap/Card'
-import Col from 'react-bootstrap/Col'
 import Accordion from 'react-bootstrap/Accordion'
 import Modal from 'react-bootstrap/Modal'
 import ListGroup from 'react-bootstrap/ListGroup'
+import Col from 'react-bootstrap/Col'
+import Row from 'react-bootstrap/Row'
+import Container from 'react-bootstrap/Container'
 import messages from '../AutoDismissAlert/messages'
 import { getItineraries, deleteItinerary, updateItinerary, addItinerary } from '../../api/itineraries'
 import { getPlan } from '../../api/plans'
@@ -226,7 +228,7 @@ const Itineraries = ({ msgAlert, userToken, match }) => {
   } else {
     return (
       <div>
-        <h2>Itinerary for {plan.destination}</h2>
+        <h2 className='page-title'>Itinerary for {plan.destination}</h2>
         {itineraries && itineraries.map(itinerary => (
           <div key={itinerary.id}>
             <Accordion>
@@ -234,7 +236,7 @@ const Itineraries = ({ msgAlert, userToken, match }) => {
                 <Card.Header><h3>{itinerary.point_of_interest}</h3></Card.Header>
                 <ListGroup>
                   <ListGroup.Item>
-                    <Card.Text><h5>On {formatDates(itinerary.date)} from {formatTimes(itinerary.start_time)} to {formatTimes(itinerary.end_time)}</h5></Card.Text>
+                    <Card.Text><h4><span className='title-class'>Date:</span> {formatDates(itinerary.date)}</h4></Card.Text>
                   </ListGroup.Item>
                 </ListGroup>
                 <Accordion.Toggle onClick={() => handleToggle(itinerary.id)} as={Button} variant="link" eventKey="1">
@@ -242,38 +244,56 @@ const Itineraries = ({ msgAlert, userToken, match }) => {
                 </Accordion.Toggle>
                 <Accordion.Collapse eventKey='1'>
                   <Card.Body>
-                    <Card.Text>{itinerary.description}.</Card.Text>
-                    <Button onClick={() => handleShow(itinerary)}>Update itinerary</Button>
-                    <Button onClick={() => handleDelete(itinerary)}>Delete itinerary</Button>
+                    <ul>
+                      <li><Card.Text><h5><span className='title-class'>Time: </span>{formatTimes(itinerary.start_time)}-{formatTimes(itinerary.end_time)}</h5></Card.Text></li>
+                      <li><Card.Text><h5><span className='title-class'>Description: </span>{itinerary.description}.</h5></Card.Text></li>
+                      <li><Card.Text><h5><span className='title-class'>Address: </span>{itinerary.address}</h5></Card.Text></li>
+                    </ul>
+                    <Container>
+                      <Row>
+                        <Col className='col-6'>
+                          <Button onClick={() => handleShow(itinerary)}>Update Itinerary Item</Button>
+                        </Col>
+                        <Col className='col-6'>
+                          <Button onClick={() => handleDelete(itinerary)}>Delete Itinerary Item</Button>
+                        </Col>
+                      </Row>
+                    </Container>
                   </Card.Body>
                 </Accordion.Collapse>
               </Card>
             </Accordion>
             <Modal show={show[itinerary.id]} onHide={() => handleClose(itinerary.id)} backdrop="static">
               <Modal.Header closeButton>
-                <Modal.Title>Update Itinerary</Modal.Title>
+                <Modal.Title className='title-class'>Update Itinerary Item</Modal.Title>
               </Modal.Header>
               <Modal.Body>
                 <Form onSubmit={handleUpdateSubmit}>
-                  <Form.Group className='col-6' controlId="formBasicPOI">
+                  <Form.Group controlId="formBasicPOI">
                     <Form.Label>Point of Interest</Form.Label>
                     <Form.Control type="text" onChange={onPOIChange} value={newItinerary.point_of_interest}/>
                   </Form.Group>
-                  <Form.Group className='col-6' controlId="formBasicDate">
-                    <Form.Label>Date</Form.Label>
-                    <Form.Control type="text" onChange={onDateChange} value={newItinerary.date}/>
+                  <Form.Group controlId="formBasicPOI">
+                    <Form.Label>Address</Form.Label>
+                    <Form.Control type="text" onChange={onAddressChange} value={newItinerary.address}/>
                   </Form.Group>
                   <Form.Row>
-                    <Col>
-                      <Form.Group controlId="formBasicStartTime">
-                        <Form.Label>Time Start</Form.Label>
-                        <Form.Control type="text" maxLength="3" onChange={onTimeStartChange} value={newItinerary.start_time} />
-                        <Form.Text>Please use 24-hour format.</Form.Text>
+                    <Col className='col-4'>
+                      <Form.Group controlId="formBasicDate">
+                        <Form.Label>Date</Form.Label>
+                        <Form.Control type="text" onChange={onDateChange} value={newItinerary.date}/>
                       </Form.Group>
                     </Col>
-                    <Col>
+                    <Col className='col-4'>
+                      <Form.Group controlId="formBasicStartTime">
+                        <Form.Label>Start Time</Form.Label>
+                        <Form.Control type="text" maxLength="3" onChange={onTimeStartChange} value={newItinerary.start_time} />
+                        <Form.Text>Please use 24hr format.</Form.Text>
+                      </Form.Group>
+                    </Col>
+                    <Col className='col-4'>
                       <Form.Group controlId="formBasicEndTime">
-                        <Form.Label>Time End</Form.Label>
+                        <Form.Label>End Time</Form.Label>
                         <Form.Control type="text" maxLength="3" onChange={onTimeEndChange} value={newItinerary.end_time} />
                       </Form.Group>
                     </Col>
@@ -282,9 +302,11 @@ const Itineraries = ({ msgAlert, userToken, match }) => {
                     <Form.Label>Description</Form.Label>
                     <Form.Control type="text" value={newItinerary.description} onChange={onDescChange}/>
                   </Form.Group>
-                  <Button variant="primary" type="submit">
-                    Update
-                  </Button>
+                  <Modal.Footer>
+                    <Button variant="primary" type="submit">
+                      Update Itinerary Item
+                    </Button>
+                  </Modal.Footer>
                 </Form>
               </Modal.Body>
             </Modal>
@@ -293,7 +315,7 @@ const Itineraries = ({ msgAlert, userToken, match }) => {
         <Accordion>
           <Card>
             <Card.Header>
-              <Accordion.Toggle as={Button} variant="link" eventKey="1">
+              <Accordion.Toggle as={Button} variant="link" eventKey="1" className='add-button'>
         Add New Itinerary Item
               </Accordion.Toggle>
             </Card.Header>
@@ -317,14 +339,14 @@ const Itineraries = ({ msgAlert, userToken, match }) => {
                   <Form.Row>
                     <Col>
                       <Form.Group controlId="formBasicStartTime">
-                        <Form.Label>Time Start</Form.Label>
+                        <Form.Label>Start Time</Form.Label>
                         <Form.Control type="text" maxLength="5" onChange={onTimeStartChange} value={newItinerary.start_time} placeholder='00:00'/>
-                        <Form.Text>Please use 24-hour format.</Form.Text>
+                        <Form.Text>Please use 24hr format.</Form.Text>
                       </Form.Group>
                     </Col>
                     <Col>
                       <Form.Group controlId="formBasicEndTime">
-                        <Form.Label>Time End</Form.Label>
+                        <Form.Label>End Time</Form.Label>
                         <Form.Control type="text" maxLength="5" onChange={onTimeEndChange} value={newItinerary.end_time} placeholder='00:00'/>
                       </Form.Group>
                     </Col>
@@ -338,7 +360,7 @@ const Itineraries = ({ msgAlert, userToken, match }) => {
                     <Form.Control type="text" value={newItinerary.description} onChange={onDescChange} placeholder="Description here"/>
                   </Form.Group>
                   <Button variant="primary" type="submit">
-                  Add Itinerary
+                  Add Itinerary Item
                   </Button>
                 </Form></Card.Text>
               </Card.Body>
@@ -352,7 +374,7 @@ const Itineraries = ({ msgAlert, userToken, match }) => {
           keyboard={false}
         >
           <Modal.Header closeButton>
-            <Modal.Title>Confirm deletion</Modal.Title>
+            <Modal.Title className='title-class'>Confirm deletion</Modal.Title>
           </Modal.Header>
           <Modal.Body>
             Are you sure you want to delete?

@@ -5,6 +5,7 @@ import { signIn } from '../../api/auth'
 import messages from '../AutoDismissAlert/messages'
 
 import Form from 'react-bootstrap/Form'
+import Card from 'react-bootstrap/Card'
 import Button from 'react-bootstrap/Button'
 
 class SignIn extends Component {
@@ -37,7 +38,7 @@ class SignIn extends Component {
         message: messages.signInSuccess,
         variant: 'success'
       }))
-      .then(() => history.push('/'))
+      .then(() => history.push('/plans'))
       .catch(error => {
         this.setState({ email: '', password: '' })
         msgAlert({
@@ -54,35 +55,38 @@ class SignIn extends Component {
     return (
       <div className="row">
         <div className="col-sm-10 col-md-8 mx-auto mt-5">
-          <h2>Sign In</h2>
-          <Form onSubmit={this.onSignIn}>
-            <Form.Group controlId="email">
-              <Form.Control
-                required
-                type="email"
-                name="email"
-                value={email}
-                placeholder="Enter email"
-                onChange={this.handleChange}
-              />
-            </Form.Group>
-            <Form.Group controlId="password">
-              <Form.Control
-                required
-                name="password"
-                value={password}
-                type="password"
-                placeholder="Password"
-                onChange={this.handleChange}
-              />
-            </Form.Group>
-            <Button
-              variant="primary"
-              type="submit"
-            >
-              Submit
-            </Button>
-          </Form>
+          <Card className='auth-card'>
+            <h3>Sign In</h3>
+            <Form className='auth-form' onSubmit={this.onSignIn}>
+              <Form.Group controlId="email">
+                <Form.Control
+                  required
+                  type="email"
+                  name="email"
+                  value={email}
+                  placeholder="Enter email"
+                  onChange={this.handleChange}
+                />
+              </Form.Group>
+              <Form.Group controlId="password">
+                <Form.Control
+                  required
+                  name="password"
+                  value={password}
+                  type="password"
+                  placeholder="Password"
+                  onChange={this.handleChange}
+                />
+              </Form.Group>
+              <Button
+                className='col-3'
+                variant="primary"
+                type="submit"
+              >
+                Submit
+              </Button>
+            </Form>
+          </Card>
         </div>
       </div>
     )
