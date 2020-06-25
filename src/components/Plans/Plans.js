@@ -483,7 +483,7 @@ const Plans = ({ userToken, msgAlert, setCurrPlan }) => {
                 <Card.Body>
                   <ul>
                     <li><Card.Text><h5><span className='title-class'>Flight to {plan.destination}:</span> Departs at {formatTimes(plan.flight_to_dep_time)} from {plan.dep_airport_code}, and arrives in {plan.arr_airport_code} at {formatTimes(plan.flight_to_arr_time)}.</h5></Card.Text></li>
-                    <li><Card.Text><h5><span className='title-class'>Hotel name:</span> {plan.hotel_name}.</h5></Card.Text></li>
+                    <li><Card.Text><h5><span className='title-class'>Hotel name:</span> {plan.hotel_name}</h5></Card.Text></li>
                     <li><Card.Text><h5><span className='title-class'>Flight from {plan.destination}:</span> Departs at {formatTimes(plan.flight_from_dep_time)} from {plan.arr_airport_code}, and arrives in {plan.dep_airport_code} at {formatTimes(plan.flight_from_arr_time)}.</h5></Card.Text></li>
                   </ul>
                   <Container>
