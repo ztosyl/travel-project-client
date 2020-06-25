@@ -9,7 +9,7 @@ This app is a travel planning app. A user is able to log on, post a plan to take
 
 ## Deployed Links
 
-[Client]()
+[Client](https://ztosyl.github.io/travel-project-client)
 [API](https://travel-project-api.herokuapp.com)
 
 ## Technologies Used
