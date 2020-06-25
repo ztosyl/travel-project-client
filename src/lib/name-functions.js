@@ -15,7 +15,6 @@ export const formatAddress = address => {
   const addressArr = []
   for (let i = 0; i < address.lines.length; i++) {
     addressArr.push(formatName(address.lines[i]))
-    console.log(address.lines[i], addressArr[i])
   }
   addressArr.push(address.postalCode)
   addressArr.push(formatName(address.cityName) + ',')
