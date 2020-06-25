@@ -16,18 +16,15 @@ class App extends Component {
     super()
 
     this.state = {
-      userId: null,
+      /* user replaced with userToken, a bit easier to manage */
       userToken: null,
       msgAlerts: []
     }
   }
 
-  setUserId = id => this.setState({ userId: id })
-
   setUserToken = token => this.setState({ userToken: token })
 
   clearUser = () => {
-    this.setState({ userId: null })
     this.setState({ userToken: null })
   }
 
@@ -36,7 +33,7 @@ class App extends Component {
   }
 
   render () {
-    const { msgAlerts, userId, userToken } = this.state
+    const { msgAlerts, userToken } = this.state
 
     return (
       <Fragment>
@@ -51,10 +48,10 @@ class App extends Component {
         ))}
         <main className="container">
           <Route path='/sign-up' render={() => (
-            <SignUp msgAlert={this.msgAlert} setUserId={this.setUserId} setUserToken={this.setUserToken} />
+            <SignUp msgAlert={this.msgAlert} setUserToken={this.setUserToken} />
           )} />
           <Route path='/sign-in' render={() => (
-            <SignIn msgAlert={this.msgAlert} setUserId={this.setUserId} setUserToken={this.setUserToken} />
+            <SignIn msgAlert={this.msgAlert} setUserToken={this.setUserToken} />
           )} />
           <AuthenticatedRoute userToken={userToken} path='/sign-out' render={() => (
             <SignOut msgAlert={this.msgAlert} clearUser={this.clearUser} userToken={userToken} />
@@ -62,11 +59,13 @@ class App extends Component {
           <AuthenticatedRoute userToken={userToken} path='/change-password' render={() => (
             <ChangePassword msgAlert={this.msgAlert} userToken={userToken} />
           )} />
+          {/* Get all of a user's plans (django already knows to only return one user's plans) */}
           <AuthenticatedRoute userToken={userToken} path='/plans' render={() => (
-            <Plans msgAlert={this.msgAlert} userToken={userToken} userId={userId}/>
+            <Plans msgAlert={this.msgAlert} userToken={userToken}/>
           )} />
+          {/* Get all itineraries associated with a certain plan */}
           <AuthenticatedRoute userToken={userToken} path='/:planId/itineraries' render={() => (
-            <Itineraries msgAlert={this.msgAlert} userToken={userToken} userId={userId}/>
+            <Itineraries msgAlert={this.msgAlert} userToken={userToken}/>
           )} />
         </main>
       </Fragment>

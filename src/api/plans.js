@@ -2,6 +2,8 @@ import apiUrl from '../apiConfig'
 import axios from 'axios'
 import { reformatDates } from '../lib/date-functions'
 
+// gets all plans for current user
+// the 'by current user' filter happens on the back end
 export const getPlans = token => {
   return axios({
     url: apiUrl + '/plans/',
@@ -12,6 +14,7 @@ export const getPlans = token => {
   })
 }
 
+// gets a single plan associated with the current user
 export const getPlan = (id, token) => {
   return axios({
     url: apiUrl + '/plans/' + id + '/',
@@ -22,7 +25,9 @@ export const getPlan = (id, token) => {
   })
 }
 
+// adds a plan
 export const addPlan = (plan, token) => {
+  // these two functions format the dates in a way Django recognizes
   const startDate = reformatDates(plan.start_date)
   const endDate = reformatDates(plan.end_date)
   return axios({
@@ -48,6 +53,7 @@ export const addPlan = (plan, token) => {
   })
 }
 
+// update one plan
 export const updatePlan = (plan, token) => {
   const startDate = reformatDates(plan.start_date)
   const endDate = reformatDates(plan.end_date)
@@ -74,6 +80,7 @@ export const updatePlan = (plan, token) => {
   })
 }
 
+// delete one plan
 export const deletePlan = (id, token) => {
   return axios({
     url: apiUrl + '/plans/' + id + '/',

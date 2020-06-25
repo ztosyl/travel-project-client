@@ -1,5 +1,6 @@
 'use strict'
 
+// takes '10:00:00' returns '10:00'
 export const formatTimes = time => {
   if (time) {
     const timeArray = time.split(':')

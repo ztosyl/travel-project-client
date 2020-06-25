@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { withRouter, Link } from 'react-router-dom'
+
+// Bootstrap components for styling
 import Form from 'react-bootstrap/Form'
 import Button from 'react-bootstrap/Button'
 import Card from 'react-bootstrap/Card'
@@ -9,15 +11,21 @@ import ListGroup from 'react-bootstrap/ListGroup'
 import Container from 'react-bootstrap/Container'
 import Row from 'react-bootstrap/Row'
 import Col from 'react-bootstrap/Col'
+
+// internal imports
 import messages from '../AutoDismissAlert/messages'
 import { getPlans, addPlan, updatePlan, deletePlan } from '../../api/plans'
-import { getFlights, getToken } from '../../api/amadeus'
+import { getFlights, getHotels, getToken } from '../../api/amadeus'
 import { formatDates, formatDatesSlash, reformatDates, findNormalDate } from '../../lib/date-functions'
 import { formatTimes, findNormalTime } from '../../lib/time-functions'
+import { formatName, formatAddress, jsxHack } from '../../lib/name-functions'
 import { addDateTimePlan, sortByDate } from '../../lib/sort'
 
 const Plans = ({ userToken, msgAlert, setCurrPlan }) => {
-  const [plans, setPlans] = useState([])
+  // The plans that will be displayed onscreen
+  // Will be 'loading' while waiting for API call, then will display plans
+  const [plans, setPlans] = useState('Loading...')
+  // The state used for posting, updating and autofilling plans
   const [newPlan, setNewPlan] = useState({
     destination: '',
     dep_airport_code: '',
@@ -31,14 +39,31 @@ const Plans = ({ userToken, msgAlert, setCurrPlan }) => {
     hotel_name: '',
     id: ''
   })
+  // triggers if I want useEffect to reload
   const [rerender, setRerender] = useState(false)
+  // whether or not update modal is shown
   const [show, setShow] = useState({})
+  // whether or not delete modal is shown
   const [showDel, setShowDel] = useState(false)
+  // whether the accordion says 'Show more' or 'Hide'
+  // it's an object because it is separate per plan instance
+  // each plan's word will be stored in a separate index in this object
   const [accordionWord, setAccordionWord] = useState({})
+  // whether or not flight search modal is shown
   const [showFlightSearch, setShowFlightSearch] = useState(false)
-  const [flightInfo, setFlightInfo] = useState('Sorry, we could not find any flights at this time. Please try again later.')
+  // the searched flight info, to be displayed when someone searches for flights
+  // displays 'Loading...' until api call is complete
+  const [flightInfo, setFlightInfo] = useState('Loading...')
+  // a state that helps us hold desired searched flight info to add it to the post plan form
   const [addFlightInfo, setAddFlightInfo] = useState({})
+  // whether or not to show hotel search modal
+  const [showHotelSearch, setShowHotelSearch] = useState(false)
+  // the searched hotel info, same as flightInfo but for hotels
+  const [hotelInfo, setHotelInfo] = useState('Loading...')
+  // again, same as addFlightInfo but for searched hotels
+  const [addHotelInfo, setAddHotelInfo] = useState({})
 
+  // resets the New Plan to default
   const resetNewPlan = () => {
     setNewPlan({
       destination: '',
@@ -56,15 +81,22 @@ const Plans = ({ userToken, msgAlert, setCurrPlan }) => {
   }
 
   useEffect(() => {
+    // get all available plans for a user
     getPlans(userToken)
       .then(data => {
         let wordObj = {}
         let showObj = {}
         for (let i = 0; i < data.data.length; i++) {
+          // data to hold for the 'Update' buttons to reference
+          // whether or not each individual plan's modal is shown is a boolean that's a value in this object
+          // the key is the unique plan ID
+          // by default, all are false
           showObj = {
             ...showObj,
             [data.data[i].id]: false
           }
+          // same logic here, but for the word on the accordion
+          // by default, all are 'Show more'
           wordObj = {
             ...wordObj,
             [data.data[i].id]: 'Show more'
@@ -72,11 +104,15 @@ const Plans = ({ userToken, msgAlert, setCurrPlan }) => {
           setShow(showObj)
           setAccordionWord(wordObj)
         }
+        // all plans except with date objects
         const datedPlans = addDateTimePlan(data.data)
+        // all plans sorted by date
         const sortedPlans = sortByDate(datedPlans)
         setPlans(sortedPlans)
       })
       .catch(() => {
+        // This will display on the main page
+        setPlans('Could not get plans. Sorry, please try again later.')
         msgAlert({
           heading: 'Plans Display Failed',
           message: messages.getPlans,
@@ -85,6 +121,8 @@ const Plans = ({ userToken, msgAlert, setCurrPlan }) => {
       })
   }, [rerender])
 
+  // next couple functions are form input handlers
+  // these work for both post and update
   const onDestChange = event => {
     setNewPlan({
       ...newPlan,
@@ -155,11 +193,14 @@ const Plans = ({ userToken, msgAlert, setCurrPlan }) => {
     })
   }
 
+  // when the user posts a new plan
   const handlePostSubmit = event => {
     event.preventDefault()
     addPlan(newPlan, userToken)
       .then(() => {
+        // reset to default
         resetNewPlan()
+        // trigger a useEffect rerender
         setRerender(!rerender)
       }
       )
@@ -172,11 +213,14 @@ const Plans = ({ userToken, msgAlert, setCurrPlan }) => {
       })
   }
 
+  // when the user updates a plan
   const handleUpdateSubmit = event => {
     event.preventDefault()
     updatePlan(newPlan, userToken)
       .then(() => {
+        // close the modal
         handleClose(newPlan.id)
+        // trigger a useEffect rerender
         setRerender(!rerender)
       }
       )
@@ -189,22 +233,30 @@ const Plans = ({ userToken, msgAlert, setCurrPlan }) => {
       })
   }
 
+  // open modal confirming whether or not user wants to delete
+  // triggers when user clicks 'delete' button on plan
   const handleDelete = plan => {
     setShowDel(true)
+    // saves current plan id to state for later use
     setNewPlan({
       id: plan.id
     })
   }
 
   const handleDelClose = event => {
+    // hide modal
     setShowDel(false)
+    // reset new plan so id is erased
     resetNewPlan()
   }
 
+  // if user confirms they want to delete the plan
   const handleConfirmDelete = event => {
     deletePlan(newPlan.id, userToken)
       .then(() => {
+        // close modal
         handleDelClose()
+        // trigger useEffect rerender
         setRerender(!rerender)
       })
       .catch(() => {
@@ -216,7 +268,10 @@ const Plans = ({ userToken, msgAlert, setCurrPlan }) => {
       })
   }
 
+  // close update modal
   const handleClose = id => {
+    // finds the specific index corresponding to that plan's id
+    // sets that value to false, hiding the modal
     setShow({
       ...show,
       [id]: false
@@ -224,6 +279,8 @@ const Plans = ({ userToken, msgAlert, setCurrPlan }) => {
     resetNewPlan()
   }
 
+  // shows update modal corresponding to specific plan
+  // uses specific plan data to autofill the fields with old plan data
   const handleShow = plan => {
     setNewPlan({
       ...plan,
@@ -240,8 +297,10 @@ const Plans = ({ userToken, msgAlert, setCurrPlan }) => {
     })
   }
 
+  // handles the toggling of 'show more' in plan
   const handleToggle = id => {
     if (accordionWord[id] === 'Show more') {
+      // finds the index corresponding to that plan, changes the word
       setAccordionWord({
         ...accordionWord,
         [id]: 'Hide'
@@ -254,14 +313,18 @@ const Plans = ({ userToken, msgAlert, setCurrPlan }) => {
     }
   }
 
+  // when user searches for flights
   const handleFlightSearch = () => {
+    // get token from API (necessary if we want to access it)
     getToken()
       .then(data => {
+        // Loading while database fetches data
+        setFlightInfo('Loading...')
+        // show the modal
+        setShowFlightSearch(true)
         const token = data.data.access_token
-        // beginning of URL
-        let urlString = 'https://test.api.amadeus.com/v2/shopping/flight-offers?'
         // add airport codes
-        urlString = urlString + `originLocationCode=${newPlan.dep_airport_code}&destinationLocationCode=${newPlan.arr_airport_code}`
+        let urlString = `originLocationCode=${newPlan.dep_airport_code}&destinationLocationCode=${newPlan.arr_airport_code}`
         // format departure and return dates to a format recognizable by the API, ex 2020-06-24
         const depDate = reformatDates(newPlan.start_date)
         const retDate = reformatDates(newPlan.end_date)
@@ -269,17 +332,20 @@ const Plans = ({ userToken, msgAlert, setCurrPlan }) => {
         urlString = urlString + `&departureDate=${depDate}&returnDate=${retDate}`
         // add some extra default variables to refine our search a bit
         // will only return nonstop flights for one adult with prices in USD
-        // will only return a maximum of 10 flights
-        urlString = urlString + '&adults=1&nonStop=true&currencyCode=USD&max=10'
+        // will only return a maximum of 20 flights
+        urlString = urlString + '&adults=1&nonStop=true&currencyCode=USD&max=20'
         // send result to API and get flights!
         return getFlights(urlString, token)
       })
       .then(data => {
+        // if nothing comes back, say so
         if (!data.data.data || data.data.data.length === 0) {
           setFlightInfo('Sorry, no flights matched your search. Please try again.')
         } else {
           let addFlightObj = {}
           const flights = data.data.data
+          // similar logic to earlier, we're storing each flight's data in an object at keys corresponding to their index
+          // this will be used if the user wants to add a particular flight to their plan
           for (let i = 0; i < flights.length; i++) {
             addFlightObj = {
               ...addFlightObj,
@@ -291,13 +357,13 @@ const Plans = ({ userToken, msgAlert, setCurrPlan }) => {
               }
             }
           }
+          // set the flight info and the information for each individual flight
           setFlightInfo(flights)
           setAddFlightInfo(addFlightObj)
         }
-        setShowFlightSearch(true)
       })
-      .catch(error => {
-        console.log(error)
+      .catch(() => {
+        // This will display on the modal
         setFlightInfo('Sorry, we could not find any flights at this time. Please try again later.')
         msgAlert({
           heading: 'Flight Search Failed',
@@ -307,25 +373,100 @@ const Plans = ({ userToken, msgAlert, setCurrPlan }) => {
       })
   }
 
+  // Just close the modal
   const handleFlightSearchClose = () => {
     setShowFlightSearch(false)
-    setFlightInfo('Sorry, we could not find any flights at this time. Please try again later.')
   }
 
+  // when a user chooses a flight they want to use
   const handleFlightSelection = index => {
-    event.preventDefault()
     const flightObj = addFlightInfo[index]
+    // sets the flight info that they clicked (by index) to the new plan
+    // this autopopulates the flight time fields with what they want
     setNewPlan({
       ...newPlan,
       ...flightObj
     })
+    // close the modal
     handleFlightSearchClose()
+  }
+
+  // handle user searching for hotels
+  const handleHotelSearch = () => {
+    // get token from API (necessary if we want to access it)
+    getToken()
+      .then(data => {
+        // show the modal, and that it's loading
+        setHotelInfo('Loading...')
+        setShowHotelSearch(true)
+        const token = data.data.access_token
+        // add airport codes
+        let urlString = `cityCode=${newPlan.arr_airport_code}`
+        // format departure and return dates to a format recognizable by the API, ex 2020-06-24
+        const depDate = reformatDates(newPlan.start_date)
+        const retDate = reformatDates(newPlan.end_date)
+        // add them to the URL we'll eventually send to Amadeus
+        urlString = urlString + `&checkInDate=${depDate}&checkOutDate=${retDate}`
+        // add some extra default variables to refine our search a bit
+        // will only return hotels for one adult within 15km of the airport with currency USD
+        // will only return a maximum of 20 hotels
+        urlString = urlString + '&adults=1&page[20]radius=60&radiusUnit=KM&currency=USD&includeClosed=true'
+        // send result to API and get flights!
+        return getHotels(urlString, token)
+      })
+      .then(data => {
+        // if there are no hotels, say so
+        if (!data.data.data || data.data.data.length === 0) {
+          setHotelInfo('Sorry, no hotels matched your search. Please try again.')
+        } else {
+          // same as before, we're saving all the info from each hotel on the state
+          // we will access it once someone chooses one
+          const hotels = data.data.data
+          let addHotelObj = {}
+          for (let i = 0; i < hotels.length; i++) {
+            addHotelObj = {
+              ...addHotelObj,
+              [i]: {
+                hotel_name: formatName(hotels[i].hotel.name)
+              }
+            }
+          }
+          setAddHotelInfo(addHotelObj)
+          setHotelInfo(hotels)
+        }
+      })
+      .catch(() => {
+        // the modal will display this if there's an error
+        setHotelInfo('Sorry, we could not find any hotels at this time. Please try again later.')
+        msgAlert({
+          heading: 'Hotel Search Failed',
+          message: messages.searchHotel,
+          variant: 'danger'
+        })
+      })
+  }
+
+  // Just close the hotel search modal
+  const handleHotelSearchClose = () => {
+    setShowHotelSearch(false)
+  }
+
+  // when the user chooses a hotel to autopopulate the post
+  const handleHotelSelection = index => {
+    // adds hotel info to new plan, which automatically fills the field in the post form
+    const hotelObj = addHotelInfo[index]
+    setNewPlan({
+      ...newPlan,
+      ...hotelObj
+    })
+    // close the modal
+    handleHotelSearchClose()
   }
 
   return (
     <div>
       <h2 className='page-title'>Travel Plans</h2>
-      {plans && plans.map((plan, index) => (
+      {Array.isArray(plans) && plans.map((plan, index) => (
         <div key={plan.id}>
           <Accordion>
             <Card>
@@ -446,6 +587,11 @@ const Plans = ({ userToken, msgAlert, setCurrPlan }) => {
           </Modal>
         </div>
       ))}
+      {!Array.isArray(plans) && jsxHack(plans).map(plan => (
+        <Card key={plan}>
+          <Card.Header><h3>{plans}</h3></Card.Header>
+        </Card>
+      ))}
       <Accordion>
         <Card>
           <Card.Header>
@@ -485,7 +631,6 @@ const Plans = ({ userToken, msgAlert, setCurrPlan }) => {
                   <Col className='col-3'>
                     <Form.Group controlId="formBasicArrivalDate">
                       <Form.Label>Return Date</Form.Label>
-                      <Form.Label></Form.Label>
                       <Form.Control type="text" maxLength="10" value={newPlan.end_date} onChange={onReturnDateChange} placeholder="MM/DD/YYYY" />
                       <Form.Text className='faux-link' onClick={handleFlightSearch}>Search available flights with this info.</Form.Text>
                     </Form.Group>
@@ -522,6 +667,7 @@ const Plans = ({ userToken, msgAlert, setCurrPlan }) => {
                   <Form.Group controlId="formBasicHotel">
                     <Form.Label>Hotel Name</Form.Label>
                     <Form.Control type="text" value={newPlan.hotel_name} onChange={onHotelChange} placeholder="Enter hotel name" />
+                    <Form.Text className='faux-link' onClick={handleHotelSearch}>Search available hotels near destination airport on dates input.</Form.Text>
                   </Form.Group>
                 </Col>
                 <Col>
@@ -587,6 +733,40 @@ const Plans = ({ userToken, msgAlert, setCurrPlan }) => {
         </Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={handleFlightSearchClose}>
+            Close
+          </Button>
+        </Modal.Footer>
+      </Modal>
+      <Modal
+        show={showHotelSearch}
+        onHide={handleHotelSearchClose}
+        backdrop="static"
+        keyboard={false}
+      >
+        <Modal.Header closeButton>
+          <Modal.Title className='title-class'>Hotels Available</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          {Array.isArray(hotelInfo) && hotelInfo.map((hotel, index) => (
+            <div key={hotel.hotel.hotelId}>
+              <Card className='flight-card'>
+                <Card.Body>
+                  <Card.Title className='title-class flight-title'><h3>{formatName(hotel.hotel.name)}</h3></Card.Title>
+                  <ListGroup className="list-group-flush flight-listgroup">
+                    <ListGroup.Item>Distance from Airport: {hotel.hotel.hotelDistance.distance} km</ListGroup.Item>
+                    <ListGroup.Item>Address: {formatAddress(hotel.hotel.address)}</ListGroup.Item>
+                    <ListGroup.Item>Phone Number: {hotel.hotel.contact.phone}</ListGroup.Item>
+                  </ListGroup>
+                  <Card.Title className='flight-title'>Price: {hotel.offers ? hotel.offers[0].price.total : 'N/A'}</Card.Title>
+                  <Button onClick={() => handleHotelSelection(index)} className='btn btn-primary'>Use This Hotel</Button>
+                </Card.Body>
+              </Card>
+            </div>
+          ))}
+          {!Array.isArray(hotelInfo) && hotelInfo}
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={handleHotelSearchClose}>
             Close
           </Button>
         </Modal.Footer>

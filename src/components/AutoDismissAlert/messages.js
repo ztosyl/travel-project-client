@@ -1,18 +1,20 @@
 export default {
   signUpSuccess: 'Succesfully registered! You\'ve been signed in as well.',
-  signUpFailure: 'Registration failed. Email may be taken, or passwords don\'t match.',
+  signUpFailure: 'Registration failed. Email may be taken, passwords may not match, or your password may not be long enough.',
   signInSuccess: 'Welcome!',
   signInFailure: 'Failed to sign in. Check your email and password and try again.',
   signOutSuccess: 'Come back soon!',
   changePasswordSuccess: 'Password changed successfully!',
-  changePasswordFailure: 'Failed to change passwords. Check your old password and try again.',
+  changePasswordFailure: 'Failed to change passwords. Check your old password, make sure your new password has at least five characters and try again.',
   getPlans: 'Failed to get plans. Try again later.',
   addPlan: 'Failed to add plan. Make sure you filled out all elements of the form in the format provided.',
   updatePlan: 'Failed to update plan. Make sure you filled out all elements of the form in the format provided.',
   deletePlan: 'Failed to delete plan. Please try again later.',
+  postPlan: 'Failed to post plan. Make sure you filled out all elements of the form in the format provided.',
   getItineraries: 'Failed to get itinerary. Try again later.',
   deleteItinerary: 'Failed to delete itinerary items. Try again later.',
   updateItinerary: 'Failed to update itinerary item. Make sure you filled out all elements of the form in the format provided.',
   postItinerary: 'Failed to post itinerary item. Make sure you filled out all elements of the form in the format provided.',
-  searchFlight: 'Failed to find flights. Please try again later.'
+  searchFlight: 'Failed to find flights. Please make sure both airline codes and dates are filled in properly.',
+  searchHotel: 'Failed to find flights. Please make your destination airline code and dates are filled in properly. Also, make sure you are not trying to book too far in advance.'
 }

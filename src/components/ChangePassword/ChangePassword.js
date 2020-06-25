@@ -72,6 +72,7 @@ class ChangePassword extends Component {
                   placeholder="New Password"
                   onChange={this.handleChange}
                 />
+                <Form.Label>Password must be at least five characters long.</Form.Label>
               </Form.Group>
               <div clasName='center-button'>
                 <Button

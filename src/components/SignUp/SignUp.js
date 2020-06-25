@@ -26,12 +26,11 @@ class SignUp extends Component {
   onSignUp = event => {
     event.preventDefault()
 
-    const { msgAlert, history, setUserId, setUserToken } = this.props
+    const { msgAlert, history, setUserToken } = this.props
 
     signUp(this.state)
       .then(() => signIn(this.state))
       .then(res => {
-        setUserId(res.data.id)
         setUserToken(res.data.token)
       })
       .then(() => msgAlert({
@@ -78,6 +77,7 @@ class SignUp extends Component {
                   placeholder="Password"
                   onChange={this.handleChange}
                 />
+                <Form.Label>Password must be at least five characters long.</Form.Label>
               </Form.Group>
               <Form.Group controlId="passwordConfirmation">
                 <Form.Control

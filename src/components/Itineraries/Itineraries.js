@@ -14,11 +14,12 @@ import { getItineraries, deleteItinerary, updateItinerary, addItinerary } from '
 import { getPlan } from '../../api/plans'
 import { formatDates, formatDatesSlash } from '../../lib/date-functions'
 import { formatTimes } from '../../lib/time-functions'
+import { jsxHack } from '../../lib/name-functions'
 import { addDateTimeItinerary, sortByDate } from '../../lib/sort'
 
 const Itineraries = ({ msgAlert, userToken, match }) => {
   const { planId } = match.params
-  const [itineraries, setItineraries] = useState([])
+  const [itineraries, setItineraries] = useState('Loading...')
   const [newItinerary, setNewItinerary] = useState({
     date: '',
     start_time: '',
@@ -60,8 +61,8 @@ const Itineraries = ({ msgAlert, userToken, match }) => {
       .then(data => {
         setPlan(data.data)
       })
-      .catch(error => {
-        console.log(error)
+      .catch(() => {
+        setItineraries('Could not get itinerary. Sorry, please try again later.')
         msgAlert({
           heading: 'Itinerary Display Failed',
           message: messages.getItineraries,
@@ -229,7 +230,7 @@ const Itineraries = ({ msgAlert, userToken, match }) => {
     return (
       <div>
         <h2 className='page-title'>Itinerary for {plan.destination}</h2>
-        {itineraries && itineraries.map(itinerary => (
+        {Array.isArray(itineraries) && itineraries.map(itinerary => (
           <div key={itinerary.id}>
             <Accordion>
               <Card>
@@ -311,6 +312,11 @@ const Itineraries = ({ msgAlert, userToken, match }) => {
               </Modal.Body>
             </Modal>
           </div>
+        ))}
+        {!Array.isArray(itineraries) && jsxHack(itineraries).map(itineraries => (
+          <Card key={itineraries}>
+            <Card.Header><h3>{itineraries}</h3></Card.Header>
+          </Card>
         ))}
         <Accordion>
           <Card>

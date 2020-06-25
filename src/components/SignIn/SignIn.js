@@ -25,12 +25,10 @@ class SignIn extends Component {
   onSignIn = event => {
     event.preventDefault()
 
-    const { msgAlert, history, setUserId, setUserToken } = this.props
+    const { msgAlert, history, setUserToken } = this.props
 
     signIn(this.state)
       .then(res => {
-        console.log(res)
-        setUserId(res.data.id)
         setUserToken(res.data.token)
       })
       .then(() => msgAlert({

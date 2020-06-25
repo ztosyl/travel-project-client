@@ -2,6 +2,7 @@ import apiUrl from '../apiConfig'
 import axios from 'axios'
 import { reformatDates } from '../lib/date-functions'
 
+// get all itineraries associated with a plan
 export const getItineraries = (id, token) => {
   return axios({
     url: apiUrl + '/plans/' + id + '/itineraries',
@@ -12,6 +13,7 @@ export const getItineraries = (id, token) => {
   })
 }
 
+// delete one itinerary
 export const deleteItinerary = (id, token) => {
   return axios({
     url: apiUrl + '/itineraries/' + id + '/',
@@ -22,6 +24,7 @@ export const deleteItinerary = (id, token) => {
   })
 }
 
+// update one itinerary
 export const updateItinerary = (itinerary, token) => {
   const date = reformatDates(itinerary.date)
   return axios({
@@ -43,9 +46,9 @@ export const updateItinerary = (itinerary, token) => {
   })
 }
 
+// add one titinerary to a plan
 export const addItinerary = (id, itinerary, token) => {
   const date = reformatDates(itinerary.date)
-  console.log(itinerary)
   return axios({
     url: apiUrl + '/plans/' + id + '/itineraries/',
     method: 'POST',
