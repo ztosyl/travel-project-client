@@ -65,10 +65,10 @@ As a user, I'd like to see info on points of interest near my destination.
 [Wireframe](https://media.git.generalassemb.ly/user/27606/files/09f57800-b465-11ea-8644-052fe632d8f8)
 
 ## App Screenshots
-[Plans](https://imgur.com/nODCHsh)
-[Itineraries](https://imgur.com/JR2WF6J)
-[Flight Search](https://imgur.com/1uvreQl)
-[Hotel Search](https://imgur.com/undefined)
+![](https://imgur.com/nODCHsh)
+![](https://imgur.com/JR2WF6J)
+![](https://imgur.com/1uvreQl)
+![](https://imgur.com/undefined)
 
 ### Installation
 
