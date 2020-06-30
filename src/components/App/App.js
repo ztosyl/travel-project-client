@@ -18,14 +18,20 @@ class App extends Component {
     this.state = {
       /* user replaced with userToken, a bit easier to manage */
       userToken: null,
-      msgAlerts: []
+      msgAlerts: [],
+      isGuest: false
     }
   }
 
   setUserToken = token => this.setState({ userToken: token })
 
+  setIsGuest = bool => this.setState({ isGuest: bool })
+
   clearUser = () => {
-    this.setState({ userToken: null })
+    this.setState({
+      userToken: null,
+      isGuest: false
+    })
   }
 
   msgAlert = ({ heading, message, variant }) => {
@@ -33,11 +39,11 @@ class App extends Component {
   }
 
   render () {
-    const { msgAlerts, userToken } = this.state
+    const { msgAlerts, userToken, isGuest } = this.state
 
     return (
       <Fragment>
-        <Header user={userToken} />
+        <Header user={userToken} setIsGuest={this.setIsGuest}/>
         {msgAlerts.map((msgAlert, index) => (
           <AutoDismissAlert
             key={index}
@@ -51,7 +57,7 @@ class App extends Component {
             <SignUp msgAlert={this.msgAlert} setUserToken={this.setUserToken} />
           )} />
           <Route path='/sign-in' render={() => (
-            <SignIn msgAlert={this.msgAlert} setUserToken={this.setUserToken} />
+            <SignIn msgAlert={this.msgAlert} setUserToken={this.setUserToken} isGuest={isGuest}/>
           )} />
           <AuthenticatedRoute userToken={userToken} path='/sign-out' render={() => (
             <SignOut msgAlert={this.msgAlert} clearUser={this.clearUser} userToken={userToken} />
