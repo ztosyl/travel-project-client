@@ -16,20 +16,19 @@ class App extends Component {
     super()
 
     this.state = {
-      /* user replaced with userToken, a bit easier to manage */
-      userToken: null,
+      user: null,
       msgAlerts: [],
       isGuest: false
     }
   }
 
-  setUserToken = token => this.setState({ userToken: token })
+  setUser = newUser => this.setState({ user: newUser })
 
   setIsGuest = bool => this.setState({ isGuest: bool })
 
   clearUser = () => {
     this.setState({
-      userToken: null,
+      user: null,
       isGuest: false
     })
   }
@@ -39,11 +38,11 @@ class App extends Component {
   }
 
   render () {
-    const { msgAlerts, userToken, isGuest } = this.state
+    const { msgAlerts, user, isGuest } = this.state
 
     return (
       <Fragment>
-        <Header user={userToken} setIsGuest={this.setIsGuest}/>
+        <Header user={user} setIsGuest={this.setIsGuest}/>
         {msgAlerts.map((msgAlert, index) => (
           <AutoDismissAlert
             key={index}
@@ -54,24 +53,24 @@ class App extends Component {
         ))}
         <main className="container">
           <Route path='/sign-up' render={() => (
-            <SignUp msgAlert={this.msgAlert} setUserToken={this.setUserToken} />
+            <SignUp msgAlert={this.msgAlert} setUser={this.setUser} />
           )} />
           <Route path='/sign-in' render={() => (
-            <SignIn msgAlert={this.msgAlert} setUserToken={this.setUserToken} isGuest={isGuest}/>
+            <SignIn msgAlert={this.msgAlert} setUser={this.setUser} isGuest={isGuest}/>
           )} />
-          <AuthenticatedRoute userToken={userToken} path='/sign-out' render={() => (
-            <SignOut msgAlert={this.msgAlert} clearUser={this.clearUser} userToken={userToken} />
+          <AuthenticatedRoute user={user} path='/sign-out' render={() => (
+            <SignOut msgAlert={this.msgAlert} clearUser={this.clearUser} user={user} />
           )} />
-          <AuthenticatedRoute userToken={userToken} path='/change-password' render={() => (
-            <ChangePassword msgAlert={this.msgAlert} userToken={userToken} />
+          <AuthenticatedRoute user={user} path='/change-password' render={() => (
+            <ChangePassword msgAlert={this.msgAlert} user={user} />
           )} />
           {/* Get all of a user's plans (django already knows to only return one user's plans) */}
-          <AuthenticatedRoute userToken={userToken} path='/plans' render={() => (
-            <Plans msgAlert={this.msgAlert} userToken={userToken}/>
+          <AuthenticatedRoute user={user} path='/plans' render={() => (
+            <Plans msgAlert={this.msgAlert} user={user}/>
           )} />
           {/* Get all itineraries associated with a certain plan */}
-          <AuthenticatedRoute userToken={userToken} path='/:planId/itineraries' render={() => (
-            <Itineraries msgAlert={this.msgAlert} userToken={userToken}/>
+          <AuthenticatedRoute user={user} path='/:planId/itineraries' render={() => (
+            <Itineraries msgAlert={this.msgAlert} user={user}/>
           )} />
         </main>
       </Fragment>

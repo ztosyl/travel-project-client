@@ -8,7 +8,7 @@ import Form from 'react-bootstrap/Form'
 import Card from 'react-bootstrap/Card'
 import Button from 'react-bootstrap/Button'
 
-const SignIn = ({ msgAlert, history, setUserToken, isGuest }) => {
+const SignIn = ({ msgAlert, history, setUser, isGuest }) => {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
 
@@ -30,7 +30,7 @@ const SignIn = ({ msgAlert, history, setUserToken, isGuest }) => {
     event.preventDefault()
     signIn(email, password)
       .then(res => {
-        setUserToken(res.data.token)
+        setUser(res.data)
       })
       .then(() => msgAlert({
         heading: 'Sign In Success',

@@ -17,7 +17,7 @@ import { formatTimes } from '../../lib/time-functions'
 import { jsxHack } from '../../lib/name-functions'
 import { addDateTimeItinerary, sortByDate } from '../../lib/sort'
 
-const Itineraries = ({ msgAlert, userToken, match }) => {
+const Itineraries = ({ msgAlert, user, match }) => {
   const { planId } = match.params
   const [itineraries, setItineraries] = useState('Loading...')
   const [newItinerary, setNewItinerary] = useState({
@@ -37,7 +37,7 @@ const Itineraries = ({ msgAlert, userToken, match }) => {
   const [accordionWord, setAccordionWord] = useState({})
 
   useEffect(() => {
-    getItineraries(planId, userToken)
+    getItineraries(planId, user.token)
       .then(data => {
         let showObj = {}
         let wordObj = {}
@@ -56,7 +56,7 @@ const Itineraries = ({ msgAlert, userToken, match }) => {
         const datedItineraries = addDateTimeItinerary(data.data)
         const sortedItineraries = sortByDate(datedItineraries)
         setItineraries(sortedItineraries)
-        return getPlan(planId, userToken)
+        return getPlan(planId, user.token)
       })
       .then(data => {
         setPlan(data.data)
@@ -149,7 +149,7 @@ const Itineraries = ({ msgAlert, userToken, match }) => {
 
   const handleUpdateSubmit = event => {
     event.preventDefault()
-    updateItinerary(newItinerary, userToken)
+    updateItinerary(newItinerary, user.token)
       .then(() => {
         handleClose(newItinerary.id)
         setRerender(!rerender)
@@ -166,7 +166,7 @@ const Itineraries = ({ msgAlert, userToken, match }) => {
 
   const handlePostSubmit = event => {
     event.preventDefault()
-    addItinerary(plan.id, newItinerary, userToken)
+    addItinerary(plan.id, newItinerary, user.token)
       .then(() => {
         resetNewItin()
         setRerender(!rerender)
@@ -194,7 +194,7 @@ const Itineraries = ({ msgAlert, userToken, match }) => {
   }
 
   const handleConfirmDelete = event => {
-    deleteItinerary(newItinerary.id, userToken)
+    deleteItinerary(newItinerary.id, user.token)
       .then(() => {
         handleDelClose()
         setRerender(!rerender)

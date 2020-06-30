@@ -25,9 +25,8 @@ class ChangePassword extends Component {
   onChangePassword = event => {
     event.preventDefault()
 
-    const { msgAlert, history, userToken } = this.props
-
-    changePassword(this.state, userToken)
+    const { msgAlert, history, user } = this.props
+    changePassword(this.state, user.token)
       .then(() => msgAlert({
         heading: 'Change Password Success',
         message: messages.changePasswordSuccess,

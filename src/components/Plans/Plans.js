@@ -21,7 +21,7 @@ import { formatTimes, findNormalTime } from '../../lib/time-functions'
 import { formatName, formatAddress, jsxHack } from '../../lib/name-functions'
 import { addDateTimePlan, sortByDate } from '../../lib/sort'
 
-const Plans = ({ userToken, msgAlert, setCurrPlan }) => {
+const Plans = ({ user, msgAlert, setCurrPlan }) => {
   // The plans that will be displayed onscreen
   // Will be 'loading' while waiting for API call, then will display plans
   const [plans, setPlans] = useState('Loading...')
@@ -82,7 +82,7 @@ const Plans = ({ userToken, msgAlert, setCurrPlan }) => {
 
   useEffect(() => {
     // get all available plans for a user
-    getPlans(userToken)
+    getPlans(user.token)
       .then(data => {
         let wordObj = {}
         let showObj = {}
@@ -196,7 +196,7 @@ const Plans = ({ userToken, msgAlert, setCurrPlan }) => {
   // when the user posts a new plan
   const handlePostSubmit = event => {
     event.preventDefault()
-    addPlan(newPlan, userToken)
+    addPlan(newPlan, user.token)
       .then(() => {
         // reset to default
         resetNewPlan()
@@ -216,7 +216,7 @@ const Plans = ({ userToken, msgAlert, setCurrPlan }) => {
   // when the user updates a plan
   const handleUpdateSubmit = event => {
     event.preventDefault()
-    updatePlan(newPlan, userToken)
+    updatePlan(newPlan, user.token)
       .then(() => {
         // close the modal
         handleClose(newPlan.id)
@@ -252,7 +252,7 @@ const Plans = ({ userToken, msgAlert, setCurrPlan }) => {
 
   // if user confirms they want to delete the plan
   const handleConfirmDelete = event => {
-    deletePlan(newPlan.id, userToken)
+    deletePlan(newPlan.id, user.token)
       .then(() => {
         // close modal
         handleDelClose()
